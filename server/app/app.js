@@ -84,6 +84,8 @@ module.exports = function() {
         rooms.push(newRoom);
 
         res.status(200).send({ message: "success", roomCode: newRoomCode });
+
+        console.log("Player " + hostPlayerID + " created room " + newRoomCode);
     });
 
     app.put("/api/join-room", function(req, res) {
@@ -107,6 +109,8 @@ module.exports = function() {
         rooms[roomIndex].players.push(playerId);
 
         res.status(200).send({ message: "success" })
+
+        console.log("Player " + playerId + " joined room " + wantedRoomId + " (total " + rooms[roomIndex].players.length + " players in room)");
     });
 
     app.put("/api/start-room", function(req, res) {
@@ -117,8 +121,17 @@ module.exports = function() {
 
         if (!validateRoom(req, res, rooms)) return;
         if (!validateRoomOwner(req, res, rooms)) return;
+        if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
         res.status(200).send({ message: "room started" });
+
+        var room = getRoom(req, rooms);
+
+        // Update room status
+        room["inRoom"] = false;
+        room["inGame"] = true;
+
+        console.log("Room " + room["roomCode"] + " was started (" + room.players.length + " players)");
     });
 
     // API routes that touch the DB
@@ -197,10 +210,10 @@ function validateRoomOwner(req, res, rooms) {
     var room = getRoom(req, rooms);
     if (!validateRoomObject(res, rooms)) return false;
 
-    return room.hostPlayer === req.body["PlayerID"]
+    return room.hostPlayer === req.body["PlayerID"];
 }
 
-function validateRoomStatus(req, res, inRoom, inGame, inFinal) {
+function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal) {
     var room = getRoom(req, rooms);
     if (!validateRoomObject(res, room)) return false;
 
