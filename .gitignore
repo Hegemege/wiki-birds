@@ -38,6 +38,8 @@ sysinfo.txt
 
 // NODE
 
+server/db.json // db
+
 # Logs
 logs
 *.log

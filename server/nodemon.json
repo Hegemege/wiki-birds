@@ -1,0 +1,17 @@
+{
+  "restartable": "rs",
+  "ignore": [
+    ".DS_Store",
+    ".git",
+    "node_modules"
+  ],
+  "verbose": false,
+  "watch": [
+    "app",
+    "config"
+  ],
+  "ext": "js json",
+  "env": {
+    "NODE_ENV": "dev"
+  }
+}
