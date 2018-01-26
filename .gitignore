@@ -37,8 +37,8 @@ sysinfo.txt
 
 
 // NODE
-
-server/db.json // db
+// db
+**/db.json
 
 # Logs
 logs
