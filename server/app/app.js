@@ -75,6 +75,7 @@ module.exports = function() {
     setInterval(() => {
         var now = (new Date()).getTime();
         rooms = rooms.filter(room => now - room["lastUpdateTimeStamp"] < 5*60*1000);
+        rooms = rooms.filter(room => room.players.length > 0);
     }, 2.5*60*1000);
 
     // API routes
@@ -120,11 +121,16 @@ module.exports = function() {
 
         // If player is already in room
         if (rooms[roomIndex].players.findIndex(player => player["playerId"] === playerId) !== -1) {
-            res.status(403).send({ error: "Player " + playerId + " already in room " + wantedRoomId});
+            res.status(400).send({ error: "Player " + playerId + " already in room " + wantedRoomId});
             return;
         }
 
         var room = getRoom(req, rooms);
+
+        if (room.hostPlayer === null) {
+            res.status(400).send({ error: "Room abandoned. "});
+            return;
+        }
 
         // Add player to room
         var newPlayer = new Player(getRandomPlayerName(room), playerId);
@@ -133,6 +139,58 @@ module.exports = function() {
         res.status(200).send({ message: "success", playerName: newPlayer["name"] })
 
         console.log("Player " + playerId + " joined room " + wantedRoomId + " (total " + rooms[roomIndex].players.length + " players in room)");
+    });
+
+    app.put("/api/leave-room", function(req, res) {
+        if (!validateToken(req, res)) return;
+        if (!validate(req, res, "PlayerID", false)) return;
+        if (!validate(req, res, "RoomID", false)) return;
+
+        if (!validateRoom(req, res, rooms)) return;
+
+        if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
+
+        var room = getRoom(req, rooms);
+
+        // Remove player from room
+        var playerId = req.body["PlayerID"];
+        room.players = room.players.filter(player => player["playerId"] !== playerId);
+
+        if (playerId === room.hostPlayer) {
+            if (room.players.length > 0) {
+                room.hostPlayer = room.players[0]["playerId"];
+            } else {
+                room.hostPlayer = "";
+            }
+        }
+
+        res.status(200).send({ message: "success" })
+
+        console.log("Player " + playerId + " left room " + room["roomCode"] + " (total " + room.players.length + " players in room)");
+    });
+
+    app.put("/api/room-info", function(req, res) {
+        if (!validateToken(req, res)) return;
+        if (!validate(req, res, "PlayerID", false)) return;
+        if (!validate(req, res, "RoomID", false)) return;
+
+        if (!validateRoom(req, res, rooms)) return;
+
+        if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
+
+        var room = getRoom(req, rooms);
+
+        // Build an object representing the room data
+
+        var data = {
+            players: room.players.map(player => player["name"]),
+            host: room.hostPlayer,
+            roomCode: room.roomCode
+        }
+
+        res.status(200).send({ message: "success", "data": data })
+
+        console.log("Player " + req.body["PlayerID"] + " left room " + room["roomCode"] + " (total " + room.players.length + " players in room)");
     });
 
     app.put("/api/start-room", function(req, res) {
@@ -220,7 +278,7 @@ function validatePlayerInRoom(req, res, rooms, roomId) {
 
     // If player is not in room
     if (room.players.findIndex(player => player["playerId"] === playerId) === -1) {
-        res.status(403).send({ error: "Player " + playerId + " not in room " + room["roomCode"]});
+        res.status(400).send({ error: "Player " + playerId + " not in room " + room["roomCode"]});
         return false;
     }
 
@@ -231,7 +289,12 @@ function validateRoomOwner(req, res, rooms) {
     var room = getRoom(req, rooms);
     if (!validateRoomObject(res, rooms)) return false;
 
-    return room.hostPlayer === req.body["PlayerID"];
+    if (room.hostPlayer !== req.body["PlayerID"]) {
+        res.status(400).send({ error: "Player " + req.body["PlayerID"] + " is not the owner of room " + room["roomCode"]});
+        return false;
+    }
+
+    return true;
 }
 
 function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal) {
@@ -239,7 +302,7 @@ function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal) {
     if (!validateRoomObject(res, room)) return false;
 
     if (room["inRoom"] !== inRoom || room["inGame"] !== inGame || room["inFinal"] !== inFinal) {
-        res.status(403).send({ error: "Room is in incorrect state: " + 
+        res.status(400).send({ error: "Room is in incorrect state: " + 
             "inRoom: " +  room["inRoom"] + ", " +
             "inGame: " +  room["inGame"] + ", " +
             "inFinal: " +  room["inFinal"]
@@ -269,7 +332,6 @@ function validateRoomObject(res, room) {
 }
 
 function getRandomRoomCode(currentRoomCodes) {
-    return "1234"; // TEMP
     return Math.floor(Math.random()*10000).toString().padStart(4, "0");
 }
 
