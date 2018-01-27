@@ -8,7 +8,8 @@ public class JoinMenuUIController : MonoBehaviour
 {
     private int[] code;
 
-    public List<Text> codeTexts;
+    public List<Image> codeImages;
+    public List<Sprite> AllNumbers;
 
     void Awake()
     {
@@ -46,7 +47,7 @@ public class JoinMenuUIController : MonoBehaviour
     {
         for (var i = 0; i < 4; i++)
         {
-            codeTexts[i].text = code[i].ToString();
+            codeImages[i].sprite = AllNumbers[code[i]];
         }
     }
 }

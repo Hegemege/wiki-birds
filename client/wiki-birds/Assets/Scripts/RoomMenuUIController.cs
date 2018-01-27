@@ -22,13 +22,14 @@ public class RoomMenuUIController : MonoBehaviour
     public GameObject LoadingBG;
 
     private bool _gotRoomData;
+    private Coroutine _infoCoroutine;
 
     void Awake()
     {
         LoadingBG.SetActive(true);
 
         // Start room info loop
-        StartCoroutine(GetRoomInfo());
+        _infoCoroutine = StartCoroutine(GetRoomInfo());
     }
 
     private IEnumerator GetRoomInfo()
@@ -63,6 +64,7 @@ public class RoomMenuUIController : MonoBehaviour
 
     public void LeaveButtonPressed()
     {
+        StopCoroutine(_infoCoroutine);
         GameManager.Instance.LeaveRoom();
         LeaveButton.SetActive(false);
     }

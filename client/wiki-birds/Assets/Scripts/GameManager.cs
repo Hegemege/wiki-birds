@@ -87,7 +87,6 @@ public class GameManager : MonoBehaviour
 
     public void NewGame()
     {
-        Debug.Log("Request a new game");
         StartCoroutine(RequestNewRoom());
     }
 
@@ -130,8 +129,6 @@ public class GameManager : MonoBehaviour
             else // Success
             {
                 ConnectionStatus = 1;
-
-                Debug.Log(request.downloadHandler.text);
 
                 var responseBody = JObject.Parse(request.downloadHandler.text);
                 if (!responseBody["message"].ToString().Equals("success"))
