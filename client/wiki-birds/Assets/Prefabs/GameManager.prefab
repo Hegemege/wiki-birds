@@ -52,7 +52,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Token: 9QfdXsTwmOPySh1zaB8A
-  Server: {fileID: 11400000, guid: a06c22af988b5ae4fa0f457e7be2eb14, type: 2}
+  Server: {fileID: 11400000, guid: 2c2bb17efd7d2374d9e63aad816f0a0a, type: 2}
   ConnectionStatus: 0
+  RoomStatus: 0
   ErrorMessage: 
+  PlayerName: 
   IsHost: 0
+  RoomCode: 
