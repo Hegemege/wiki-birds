@@ -45,13 +45,21 @@ public class RoomMenuUIController : MonoBehaviour
 
     public void UpdateRoomInfo(List<string> players)
     {
-        PlayerListHeader.text = "Players (" + players.Count + ")";
+        PlayerListHeader.text = "Players (" + players.Count + " / 4)";
         PlayerList.text = String.Join("\n", players.ToArray());
 
         StartButton.SetActive(GameManager.Instance.IsHost);
-        StartText.text = GameManager.Instance.IsHost ? "Tap START when ready." : "Waiting for host...";
+        if (players.Count < 2 || players.Count > 4)
+        {
+            StartText.text = players.Count < 2 ? "Waiting for players..." : "Too many players!";
+            StartButton.SetActive(false);
+        }
+        else
+        {
+            StartText.text = GameManager.Instance.IsHost ? "Tap START when ready." : "Waiting for host to start the game";
+        }
 
-        PlayerName.text = GameManager.Instance.PlayerName;
+        PlayerName.text = "You:\n" + GameManager.Instance.PlayerName;
 
         Code.text = GameManager.Instance.RoomCode;
 

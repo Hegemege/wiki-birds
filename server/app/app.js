@@ -27,6 +27,7 @@ class Player {
     constructor(name, playerId) {
         this.playerId = playerId;
         this.name = name;
+        this.color = getRandomPlayerColor();
     }
 }
 
@@ -51,12 +52,19 @@ const PlayerNames = [
     "Ms. Songbird 3"
 ];
 
+const PlayerColors = [
+    "Blue", 
+    "Yellow",
+    "Red", 
+    "Green"
+];
+
 // Hardcoded token to cut away bots crawling semi-sensitive information
 // Does not secure anything, just makes sure that "most" of the traffic to the public API
 // is originated from the right source (the game). The other option is to authenticate users, overkill
 const token = "9QfdXsTwmOPySh1zaB8A";
 
-const MIN_PLAYER_COUNT = 1;
+const MIN_PLAYER_COUNT = 2;
 const MAX_PLAYER_COUNT = 4;
 
 module.exports = function() {
@@ -115,6 +123,8 @@ module.exports = function() {
 
         if (!validateRoom(req, res, rooms)) return;
 
+        if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
+
         var wantedRoomId = req.body["RoomID"];
         var roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
         var playerId = req.body["PlayerID"];
@@ -150,6 +160,8 @@ module.exports = function() {
 
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
 
+        if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
+
         var room = getRoom(req, rooms);
 
         // Remove player from room
@@ -178,6 +190,8 @@ module.exports = function() {
 
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
 
+        if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
+
         var room = getRoom(req, rooms);
 
         // Build an object representing the room data
@@ -192,21 +206,36 @@ module.exports = function() {
     });
 
     app.put("/api/start-room", function(req, res) {
+        console.log("trying to start");
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
         if (!validate(req, res, "RoomID", false)) return;
+
+        console.log("trying to start2");
 
         if (!validateRoom(req, res, rooms)) return;
         if (!validateRoomOwner(req, res, rooms)) return;
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
-        res.status(200).send({ message: "room started" });
+        console.log("trying to start3");
 
         var room = getRoom(req, rooms);
+
+        if (room.players.length < MIN_PLAYER_COUNT) {
+            res.status(400).send({ error: "Too few players in room. Minimum " + MIN_PLAYER_COUNT });
+            return;
+        }
+
+        if (room.players.length > MAX_PLAYER_COUNT) {
+            res.status(400).send({ error: "Too many players in room. Maximum " + MAX_PLAYER_COUNT });
+            return;
+        }
 
         // Update room status
         room["inRoom"] = false;
         room["inGame"] = true;
+
+        res.status(200).send({ message: "room started" });
 
         console.log("Room " + room["roomCode"] + " was started (" + room.players.length + " players)");
     });
@@ -352,4 +381,25 @@ function getRandomPlayerName(room = null) {
     } while (playerNames.indexOf(chosenName) !== -1)
 
     return chosenName;
+}
+
+function getRandomPlayerColor(room = null) {
+    if (room === null) {
+        return PlayerNames[Math.floor(Math.random() * PlayerColors.length)];
+    }
+
+    var playerColors = room["players"].map(player => player["color"]);
+    var chosenColor = "";
+
+    if (room.players.length >= PlayerColors.length) {
+        console.log("Too many players in room.");
+        return PlayerColors[0];
+    }
+
+    // Quick and dirty random name excluding the given names
+    do {
+        chosenColor = PlayerColors[Math.floor(Math.random() * PlayerNames.length)];
+    } while (playerNames.indexOf(chosenColor) !== -1)
+
+    return chosenColor;
 }

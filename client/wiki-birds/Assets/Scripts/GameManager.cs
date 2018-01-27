@@ -97,7 +97,7 @@ public class GameManager : MonoBehaviour
 
     public void StartRoom()
     {
-        StartCoroutine(RequestStartRoom());
+        StartCoroutine(RequestStartRoom(RoomCode));
     }
 
     public void LeaveRoom()
@@ -163,21 +163,23 @@ public class GameManager : MonoBehaviour
 
                 IsHost = true;
                 RoomCode = responseBody["roomCode"].ToString();
+                PlayerName = responseBody["playerName"].ToString();
 
                 SceneManager.LoadScene("room");
             }
         }
     }
 
-    private IEnumerator RequestStartRoom()
+    private IEnumerator RequestStartRoom(string roomCode)
     {
         object body = new
         {
             Token = Token,
-            PlayerID = _playerId
+            PlayerID = _playerId,
+            RoomID = roomCode
         };
 
-        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/new-room", JsonConvert.SerializeObject(body)))
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/start-room", JsonConvert.SerializeObject(body)))
         {
             request.SetRequestHeader("Content-Type", "application/json");
 
@@ -189,7 +191,7 @@ public class GameManager : MonoBehaviour
             }
             else // Success
             {
-                SceneManager.LoadScene("main");
+                SceneManager.LoadScene("game");
             }
         }
     }
@@ -278,7 +280,6 @@ public class GameManager : MonoBehaviour
 
                 var players = responseBody["players"].ToObject<List<string>>();
                 var host = responseBody["host"].ToString();
-                var gotRoomCode = responseBody["roomCode"].ToString();
 
                 IsHost = host == _playerId;
 
@@ -292,7 +293,7 @@ public class GameManager : MonoBehaviour
         ConnectionStatus = 3;
         try
         {
-            // Error after initial connetion check, go to menu and show error
+            // Error after initial connection check, go to menu and show error
             if (request.isHttpError)
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
@@ -302,9 +303,8 @@ public class GameManager : MonoBehaviour
         }
         catch (Exception ex)
         {
-            ErrorMessage = "Unknown error.";
+            ErrorMessage = "Disconnected.";
         }
-
 
         if (request.isNetworkError)
         {
