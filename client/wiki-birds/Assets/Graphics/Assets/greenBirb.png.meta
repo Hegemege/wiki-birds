@@ -1,9 +1,14 @@
 fileFormatVersion: 2
 guid: 208f35d868280964295fb7df592aaa0a
-timeCreated: 1517059369
+timeCreated: 1517059557
 licenseType: Pro
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: greenBirb_0
+    21300002: greenBirb_1
+    21300004: greenBirb_2
+    21300006: greenBirb_3
+    21300008: greenBirb_4
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -40,7 +45,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -66,9 +71,89 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: greenBirb_0
+      rect:
+        serializedVersion: 2
+        x: 91
+        y: 345
+        width: 98
+        height: 129
+      alignment: 9
+      pivot: {x: 0.49999985, y: 0.7769141}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: greenBirb_1
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 345
+        width: 102
+        height: 134
+      alignment: 9
+      pivot: {x: 0.53183794, y: 0.7827381}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: greenBirb_2
+      rect:
+        serializedVersion: 2
+        x: 441
+        y: 32
+        width: 458
+        height: 554
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: greenBirb_3
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 48
+        width: 151
+        height: 264
+      alignment: 9
+      pivot: {x: 0.46415603, y: 0.7296177}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: greenBirb_4
+      rect:
+        serializedVersion: 2
+        x: 212
+        y: 47
+        width: 163
+        height: 263
+      alignment: 9
+      pivot: {x: 0.4468721, y: 0.78399754}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
     outline: []
     physicsShape: []
   spritePackingTag: 

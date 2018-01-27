@@ -1,9 +1,14 @@
 fileFormatVersion: 2
 guid: c830237d71eda524f899191e96bb98c3
-timeCreated: 1517059371
-licenseType: Pro
+timeCreated: 1517060532
+licenseType: Free
 TextureImporter:
-  fileIDToRecycleName: {}
+  fileIDToRecycleName:
+    21300000: redBirb_0
+    21300002: redBirb_1
+    21300004: redBirb_2
+    21300006: redBirb_3
+    21300008: redBirb_4
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -40,7 +45,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -66,9 +71,75 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
+  - buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: redBirb_0
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 42
+        width: 414
+        height: 469
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: redBirb_1
+      rect:
+        serializedVersion: 2
+        x: 464
+        y: 353
+        width: 260
+        height: 163
+      alignment: 9
+      pivot: {x: 0.8399811, y: 0.4764217}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: redBirb_2
+      rect:
+        serializedVersion: 2
+        x: 797
+        y: 341
+        width: 95
+        height: 154
+      alignment: 9
+      pivot: {x: 0.49999934, y: 0.7932361}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: redBirb_3
+      rect:
+        serializedVersion: 2
+        x: 495
+        y: 135
+        width: 264
+        height: 170
+      alignment: 9
+      pivot: {x: 0.18336764, y: 0.48304445}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
     outline: []
     physicsShape: []
   spritePackingTag: 
