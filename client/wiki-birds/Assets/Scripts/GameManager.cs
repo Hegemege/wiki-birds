@@ -1,7 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -15,6 +20,9 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector]
     public int ConnectionStatus;
+
+    [HideInInspector]
+    public string ErrorMessage;
 
     //Singleton
     private static GameManager _instance;
@@ -30,6 +38,12 @@ public class GameManager : MonoBehaviour
     private string _playerId;
     private string _playerName;
 
+    [HideInInspector]
+    public bool IsHost;
+
+    [HideInInspector]
+    public string RoomCode;
+
     void Awake()
     {
         if (_instance != null)
@@ -42,20 +56,36 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
+        _playerId = System.Guid.NewGuid().ToString();
+
         // Initialize connection
+        StartCoroutine(CheckConnection());
+    }
+
+    public void ResetToMenu()
+    {
+        IsHost = false;
+        ConnectionStatus = 0;
         StartCoroutine(CheckConnection());
     }
 
     public void JoinGame()
     {
-
+        Debug.Log("Join a game");
+        SceneManager.LoadScene("join");
     }
 
     public void NewGame()
     {
-
+        Debug.Log("Request a new game");
+        StartCoroutine(RequestNewRoom());
     }
-    
+
+    public void RetryConnection()
+    {
+        ResetToMenu();
+    }
+
     /// <summary>
     /// Perform initialization steps after connection to server was established.
     /// </summary>
@@ -86,67 +116,16 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-    /*
-
-    /// <summary>
-    /// Send gameplay statistics to server.
-    /// </summary>
-    /// <param name="deviceId"></param>
-    /// <param name="sessionId"></param>
-    /// <param name="questionId"></param>
-    /// <param name="answerId"></param>
-    /// <param name="groupId"></param>
-    private void SendGameplayStatistics(string deviceId, string sessionId, int questionId, int answerId, int groupId)
-    {
-        StartCoroutine(SendStatistics(deviceId, sessionId, questionId, answerId, groupId));
-    }
-
-    // Coroutine helper for above
-    private IEnumerator SendStatistics(string deviceId, string sessionId, int questionId, int answerId, int groupId)
+    
+    private IEnumerator RequestNewRoom()
     {
         object body = new
         {
             Token = Token,
-            QuestionId = questionId,
-            AnswerId = answerId,
-            GroupId = groupId,
-            DeviceId = deviceId,
-            SessionId = sessionId
+            PlayerID = _playerId
         };
 
-        // Unity can't do POST with JSON, so we use PUT
-        using (UnityWebRequest request = UnityWebRequest.Put(Server.ServerUrl + "/api/answers", JsonConvert.SerializeObject(body)))
-        {
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            yield return request.SendWebRequest();
-
-            // We don't really need to handle the response.
-            if (request.isNetworkError || request.isHttpError) // Error
-            {
-                // Debug.Log(request.error);
-            }
-            else // Success
-            {
-                // Debug.Log(request.downloadHandler.text);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Fetches the question data from the server
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator GetQuestionData()
-    {
-        object body = new
-        {
-            Token = Token
-        };
-
-        // Unity can't do POST with JSON, so we use PUT
-        using (UnityWebRequest request = UnityWebRequest.Put(Server.ServerUrl + "/api/questions", JsonConvert.SerializeObject(body)))
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/new-room", JsonConvert.SerializeObject(body)))
         {
             request.SetRequestHeader("Content-Type", "application/json");
 
@@ -154,77 +133,44 @@ public class GameManager : MonoBehaviour
 
             if (request.isNetworkError || request.isHttpError) // Error
             {
-                InitializeLocalQuestionData();
+                HandleRequestError(request);
             }
             else // Success
             {
-                // Parse the data from the body. The body is in JSON format, and the raw file data is in JSON key "data".
                 var responseBody = JObject.Parse(request.downloadHandler.text);
-                QuestionData = QuestionCSVReader.ParseData(responseBody["data"].ToString());
+
+                IsHost = true;
+                RoomCode = responseBody["roomCode"].ToString();
+
+                SceneManager.LoadScene("room");
             }
         }
     }
 
-    /// <summary>
-    /// Fetches the background music AudioClip from the server
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator GetMusic()
+    private void HandleRequestError(UnityWebRequest request)
     {
-        object body = new
+        ConnectionStatus = 3;
+        try
         {
-            Token = Token,
-            GroupId = _groupId
-        };
-
-        // We have to first extract single-use token from the server that we use with HTTP GET, because UnityWebRequestMultimedia does not support PUT
-        using (UnityWebRequest tokenRequest = UnityWebRequest.Put(Server.ServerUrl + "/api/music", JsonConvert.SerializeObject(body)))
-        {
-            tokenRequest.SetRequestHeader("Content-Type", "application/json");
-
-            yield return tokenRequest.SendWebRequest();
-
-            if (tokenRequest.isNetworkError || tokenRequest.isHttpError) // Error
+            // Error after initial connetion check, go to menu and show error
+            if (request.isHttpError)
             {
-                // No need to handle, local AudioClip will be used
-            }
-            else // Success
-            {
-                var responseBody = JObject.Parse(tokenRequest.downloadHandler.text);
-                var musicToken = responseBody["token"].ToString();
+                var responseBody = JObject.Parse(request.downloadHandler.text);
 
-                // Unity can't do POST with JSON, so we use PUT
-                using (UnityWebRequest musicRequest = UnityWebRequestMultimedia.GetAudioClip(Server.ServerUrl + "/api/music?token=" + musicToken, AudioType.WAV))
-                {
-                    yield return musicRequest.SendWebRequest();
-
-                    if (musicRequest.isNetworkError || musicRequest.isHttpError) // Error
-                    {
-                        // No need to handle, local AudioClip will be used
-                    }
-                    else // Success
-                    {
-                        AudioClip clip = DownloadHandlerAudioClip.GetContent(musicRequest);
-                        // TODO: Perform validation
-                        // clip.length
-
-                        BackgroundMusic = clip;
-                    }
-                }
+                ErrorMessage = "Error " + request.responseCode + ": " + responseBody["error"];
             }
         }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Unknown error.";
+        }
 
-        MusicResolved();
+
+        if (request.isNetworkError)
+        {
+            ErrorMessage = "Disconnected.";
+        }
+
+        SceneManager.LoadScene("main");
     }
-
-    /// <summary>
-    /// Background music has been resolved (either locally or from the server)
-    /// </summary>
-    private void MusicResolved()
-    {
-        _backgroundMusicAudioSource.clip = BackgroundMusic;
-
-        StartLevel("player_select");
-    }
-    */
 }

@@ -51,5 +51,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffffa29fde7768f4d991754af94a4acd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Token: 07ibQSDRGK1UglWo4AYwJYlebVIxV25p
+  Token: 9QfdXsTwmOPySh1zaB8A
   Server: {fileID: 11400000, guid: a06c22af988b5ae4fa0f457e7be2eb14, type: 2}
+  ConnectionStatus: 0
+  ErrorMessage: 
+  IsHost: 0
