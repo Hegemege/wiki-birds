@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     public int ConnectionStatus;
 
     [HideInInspector]
-    public int RoomConnection;
+    public int RoomStatus;
 
     [HideInInspector]
     public string ErrorMessage;
@@ -251,6 +251,32 @@ public class GameManager : MonoBehaviour
             {                
                 ResetToMenu();
                 SceneManager.LoadScene("main");
+            }
+        }
+    }
+
+    private IEnumerator RequestRoomInfo(string roomCode)
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId,
+            RoomID = roomCode
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/room-info", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {
+                
             }
         }
     }
