@@ -18,6 +18,7 @@ class Room {
         this.inRoom = true;
         this.inGame = false;
         this.inFinal = false;
+        this.startTime = (new Date()).getTime();
         this.gameState = {};
         this.phoneLines = [];
     }
@@ -111,7 +112,7 @@ module.exports = function() {
 
         rooms.push(newRoom);
 
-        res.status(200).send({ message: "success", roomCode: newRoomCode, playerName: newRoom["players"][0]["name"] });
+        res.status(200).send({ message: "success", roomCode: newRoomCode, playerName: newRoom["players"][0]["name"], playerColor: newRoom["players"][0]["color"] });
 
         console.log("Player " + hostPlayerID + " created room " + newRoomCode);
     });
@@ -146,7 +147,7 @@ module.exports = function() {
         var newPlayer = new Player(getRandomPlayerName(room), playerId);
         rooms[roomIndex].players.push(newPlayer);
 
-        res.status(200).send({ message: "success", playerName: newPlayer["name"] })
+        res.status(200).send({ message: "success", playerName: newPlayer["name"], playerColor: newPlayer["color"] })
 
         console.log("Player " + playerId + " joined room " + wantedRoomId + " (total " + rooms[roomIndex].players.length + " players in room)");
     });
@@ -190,6 +191,13 @@ module.exports = function() {
 
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
 
+        // If room is no longer in room state, tell client to go to game
+        if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
+            var room = getRoom(req, rooms);
+            res.status(200).send({ message: "started", startTime: getSetStartTime(room) });
+            return;
+        }
+
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
         var room = getRoom(req, rooms);
@@ -206,18 +214,13 @@ module.exports = function() {
     });
 
     app.put("/api/start-room", function(req, res) {
-        console.log("trying to start");
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
         if (!validate(req, res, "RoomID", false)) return;
 
-        console.log("trying to start2");
-
         if (!validateRoom(req, res, rooms)) return;
         if (!validateRoomOwner(req, res, rooms)) return;
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
-
-        console.log("trying to start3");
 
         var room = getRoom(req, rooms);
 
@@ -387,7 +390,7 @@ function getRandomPlayerName(room = null) {
 
 function getRandomPlayerColor(room = null) {
     if (room === null) {
-        return PlayerNames[Math.floor(Math.random() * PlayerColors.length)];
+        return PlayerColors[Math.floor(Math.random() * PlayerColors.length)];
     }
 
     var playerColors = room["players"].map(player => player["color"]);
@@ -398,10 +401,18 @@ function getRandomPlayerColor(room = null) {
         return PlayerColors[0];
     }
 
-    // Quick and dirty random name excluding the given names
     do {
-        chosenColor = PlayerColors[Math.floor(Math.random() * PlayerNames.length)];
-    } while (playerNames.indexOf(chosenColor) !== -1)
+        chosenColor = PlayerColors[Math.floor(Math.random() * PlayerColors.length)];
+    } while (playerColors.indexOf(chosenColor) !== -1)
 
     return chosenColor;
+}
+
+function getSetStartTime(room) {
+    if (!room) {
+        return;
+    }
+
+    room["startName"] = (new Date()).getTime() + 10000;
+    return room["startName"];
 }

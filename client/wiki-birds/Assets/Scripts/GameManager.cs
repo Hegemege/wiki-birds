@@ -43,10 +43,16 @@ public class GameManager : MonoBehaviour
     public string PlayerName;
 
     [HideInInspector]
+    public string PlayerColor;
+
+    [HideInInspector]
     public bool IsHost;
 
     [HideInInspector]
     public string RoomCode;
+
+    [HideInInspector]
+    public DateTime NextRoundStart;
 
     void Awake()
     {
@@ -71,6 +77,7 @@ public class GameManager : MonoBehaviour
         IsHost = false;
         RoomCode = "";
         PlayerName = "";
+        PlayerColor = "";
         ConnectionStatus = 0;
         StartCoroutine(CheckConnection());
     }
@@ -164,6 +171,9 @@ public class GameManager : MonoBehaviour
                 IsHost = true;
                 RoomCode = responseBody["roomCode"].ToString();
                 PlayerName = responseBody["playerName"].ToString();
+                PlayerColor = responseBody["playerColor"].ToString();
+
+                Debug.Log(PlayerColor);
 
                 SceneManager.LoadScene("room");
             }
@@ -191,7 +201,7 @@ public class GameManager : MonoBehaviour
             }
             else // Success
             {
-                SceneManager.LoadScene("game");
+                // Next update of room-info will transfer all players to game
             }
         }
     }
@@ -221,7 +231,10 @@ public class GameManager : MonoBehaviour
 
                 RoomCode = roomCode;
                 PlayerName = responseBody["playerName"].ToString();
+                PlayerColor = responseBody["playerColor"].ToString();
                 IsHost = false;
+
+                Debug.Log(PlayerColor);
 
                 SceneManager.LoadScene("room");
             }
@@ -276,14 +289,26 @@ public class GameManager : MonoBehaviour
             }
             else // Success
             {
-                var responseBody = JObject.Parse(request.downloadHandler.text)["data"];
+                var responseBody = JObject.Parse(request.downloadHandler.text);
 
-                var players = responseBody["players"].ToObject<List<string>>();
-                var host = responseBody["host"].ToString();
+                if (responseBody["message"].ToString().Equals("started"))
+                {
+                    var startTime = responseBody["startTime"].ToObject<long>();
 
-                IsHost = host == _playerId;
+                    NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime);
 
-                callback(players);
+                    SceneManager.LoadScene("game");
+                    yield break;
+                }
+                else
+                {
+                    var players = responseBody["data"]["players"].ToObject<List<string>>();
+                    var host = responseBody["data"]["host"].ToString();
+
+                    IsHost = host == _playerId;
+
+                    callback(players);
+                }
             }
         }
     }
