@@ -19,8 +19,6 @@ class Room {
         this.inGame = false;
         this.inFinal = false;
         this.startTime = (new Date()).getTime();
-        this.gameState = {};
-        this.phoneLines = [];
     }
 }
 
@@ -29,6 +27,7 @@ class Player {
         this.playerId = playerId;
         this.name = name;
         this.color = getRandomPlayerColor();
+        this.lineIndex = -1;
     }
 }
 
@@ -241,6 +240,21 @@ module.exports = function() {
         res.status(200).send({ message: "room started" });
 
         console.log("Room " + room["roomCode"] + " was started (" + room.players.length + " players)");
+    });
+
+    app.put("/api/game-info", function(req, res) {
+        if (!validateToken(req, res)) return;
+        if (!validate(req, res, "PlayerID", false)) return;
+        if (!validate(req, res, "RoomID", false)) return;
+
+        if (!validateRoom(req, res, rooms)) return;
+        if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
+        if (!validateRoomStatus(req, res, rooms, false, true, false)) return;
+
+        var room = getRoom(req, rooms);
+
+
+
     });
 
 /*

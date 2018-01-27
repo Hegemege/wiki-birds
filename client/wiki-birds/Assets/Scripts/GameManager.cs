@@ -112,6 +112,13 @@ public class GameManager : MonoBehaviour
         StartCoroutine(RequestLeaveRoom(RoomCode));
     }
 
+    // Needs to be able to be interrupted, so Coroutine return
+    public Coroutine GetGameInfo(Action<JObject> callback)
+    {
+        return StartCoroutine(RequestGameInfo(callback));
+    }
+
+    // Needs to be able to be interrupted, so Coroutine return
     public Coroutine GetRoomInfo(Action<List<string>> callback)
     {
         return StartCoroutine(RequestRoomInfo(RoomCode, callback));
@@ -173,8 +180,6 @@ public class GameManager : MonoBehaviour
                 PlayerName = responseBody["playerName"].ToString();
                 PlayerColor = responseBody["playerColor"].ToString();
 
-                Debug.Log(PlayerColor);
-
                 SceneManager.LoadScene("room");
             }
         }
@@ -233,8 +238,6 @@ public class GameManager : MonoBehaviour
                 PlayerName = responseBody["playerName"].ToString();
                 PlayerColor = responseBody["playerColor"].ToString();
                 IsHost = false;
-
-                Debug.Log(PlayerColor);
 
                 SceneManager.LoadScene("room");
             }
@@ -309,6 +312,35 @@ public class GameManager : MonoBehaviour
 
                     callback(players);
                 }
+            }
+        }
+    }
+
+    private IEnumerator RequestGameInfo(Action<JObject> callback)
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId,
+            RoomID = RoomCode
+            // TODO: player actions
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/room-info", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                callback(responseBody);
             }
         }
     }
