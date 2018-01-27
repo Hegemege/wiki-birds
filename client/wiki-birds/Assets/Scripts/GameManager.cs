@@ -326,7 +326,7 @@ public class GameManager : MonoBehaviour
             // TODO: player actions
         };
 
-        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/room-info", JsonConvert.SerializeObject(body)))
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/game-info", JsonConvert.SerializeObject(body)))
         {
             request.SetRequestHeader("Content-Type", "application/json");
 

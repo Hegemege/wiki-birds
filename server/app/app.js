@@ -18,7 +18,9 @@ class Room {
         this.inRoom = true;
         this.inGame = false;
         this.inFinal = false;
-        this.startTime = (new Date()).getTime();
+        this.startTime = null;
+        this.endTime = null;
+        this.correctLines = [];
     }
 }
 
@@ -28,6 +30,7 @@ class Player {
         this.name = name;
         this.color = getRandomPlayerColor();
         this.lineIndex = -1;
+        this.word = "";
     }
 }
 
@@ -39,6 +42,17 @@ player
 
 
 */
+
+const Positions = [
+    0, 1, 2, 3
+];
+
+const Words = [
+    "Word 1",
+    "Word 2",
+    "Word 3",
+    "Word 4"
+];
 
 const PlayerNames = [
     "Birdy Mc Birdface",
@@ -67,6 +81,9 @@ const token = "9QfdXsTwmOPySh1zaB8A";
 const MIN_PLAYER_COUNT = 2;
 const MAX_PLAYER_COUNT = 4;
 
+const ROUND_START_DELAY = 10 * 1000;
+const ROUND_LENGTH = 30 * 1000;
+
 module.exports = function() {
     const app = express();
     app.use(bodyParser.json());
@@ -76,12 +93,12 @@ module.exports = function() {
  //   const adapter = new FileAsync(path.resolve(__dirname, "db.json"));
 
     // Room servicing
-    var rooms = [];
+    let rooms = [];
 
     // Clear old rooms every 2.5 minutes
     // Avoids a memory leak over time
     setInterval(() => {
-        var now = (new Date()).getTime();
+        let now = (new Date()).getTime();
         rooms = rooms.filter(room => now - room["lastUpdateTimeStamp"] < 5*60*1000);
         rooms = rooms.filter(room => room.players.length > 0);
     }, 2.5*60*1000);
@@ -99,15 +116,15 @@ module.exports = function() {
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
 
-        var hostPlayerID = req.body["PlayerID"];
+        let hostPlayerID = req.body["PlayerID"];
 
-        var newRoomCode = "";
+        let newRoomCode = "";
 
         do {
             newRoomCode = getRandomRoomCode();
         } while (rooms.findIndex(room => room["roomCode"] === newRoomCode) !== -1)
 
-        var newRoom = new Room(newRoomCode, hostPlayerID);
+        let newRoom = new Room(newRoomCode, hostPlayerID);
 
         rooms.push(newRoom);
 
@@ -125,9 +142,9 @@ module.exports = function() {
 
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
-        var wantedRoomId = req.body["RoomID"];
-        var roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
-        var playerId = req.body["PlayerID"];
+        let wantedRoomId = req.body["RoomID"];
+        let roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
+        let playerId = req.body["PlayerID"];
 
         // If player is already in room
         if (rooms[roomIndex].players.findIndex(player => player["playerId"] === playerId) !== -1) {
@@ -135,7 +152,7 @@ module.exports = function() {
             return;
         }
 
-        var room = getRoom(req, rooms);
+        let room = getRoom(req, rooms);
 
         if (room.hostPlayer === null) {
             res.status(400).send({ error: "Room abandoned. "});
@@ -143,7 +160,7 @@ module.exports = function() {
         }
 
         // Add player to room
-        var newPlayer = new Player(getRandomPlayerName(room), playerId);
+        let newPlayer = new Player(getRandomPlayerName(room), playerId);
         rooms[roomIndex].players.push(newPlayer);
 
         res.status(200).send({ message: "success", playerName: newPlayer["name"], playerColor: newPlayer["color"] })
@@ -162,10 +179,10 @@ module.exports = function() {
 
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
-        var room = getRoom(req, rooms);
+        let room = getRoom(req, rooms);
 
         // Remove player from room
-        var playerId = req.body["PlayerID"];
+        let playerId = req.body["PlayerID"];
         room.players = room.players.filter(player => player["playerId"] !== playerId);
 
         if (playerId === room.hostPlayer) {
@@ -192,18 +209,18 @@ module.exports = function() {
 
         // If room is no longer in room state, tell client to go to game
         if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
-            var room = getRoom(req, rooms);
-            res.status(200).send({ message: "started", startTime: getSetStartTime(room) });
+            let room = getRoom(req, rooms);
+            res.status(200).send({ message: "started", startTime: room["startTime"], endTime: room["endTime"] });
             return;
         }
 
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
-        var room = getRoom(req, rooms);
+        let room = getRoom(req, rooms);
 
         // Build an object representing the room data
 
-        var data = {
+        let data = {
             players: room.players.map(player => player["name"]),
             host: room.hostPlayer,
             roomCode: room.roomCode
@@ -221,7 +238,7 @@ module.exports = function() {
         if (!validateRoomOwner(req, res, rooms)) return;
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
-        var room = getRoom(req, rooms);
+        let room = getRoom(req, rooms);
 
         if (room.players.length < MIN_PLAYER_COUNT) {
             res.status(400).send({ error: "Too few players in room. Minimum " + MIN_PLAYER_COUNT });
@@ -237,6 +254,27 @@ module.exports = function() {
         room["inRoom"] = false;
         room["inGame"] = true;
 
+        // Update bird positions
+        let positions = getPlayerPositions(room);
+        for (let i = 0; i < room.players.length; i++) {
+            room.players[i]["lineIndex"] = positions[i];
+        }
+
+        // Update line clues
+        let clues = getLineClues();
+        for (let i = 0; i < room.players.length; i++) {
+            // Assign words
+            room.players[i]["word"] = clues[i];
+        }
+
+        // Shuffle them and assign them to lines
+        shuffle(clues);
+        room["correctLines"] = clues;
+
+        // Initialize timers
+        getSetStartTime(room);
+        getSetEndTime(room);
+
         res.status(200).send({ message: "room started" });
 
         console.log("Room " + room["roomCode"] + " was started (" + room.players.length + " players)");
@@ -251,10 +289,11 @@ module.exports = function() {
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
         if (!validateRoomStatus(req, res, rooms, false, true, false)) return;
 
-        var room = getRoom(req, rooms);
+        let room = getRoom(req, rooms);
 
+        room.lastUpdateTimeStamp = (new Date()).getTime();
 
-
+        res.status(200).send(room);
     });
 
 /*
@@ -304,8 +343,8 @@ function validate(req, res, field, numeric) {
 }
 
 function validateRoom(req, res, rooms) {
-    var wantedRoomId = req.body["RoomID"];
-    var roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
+    let wantedRoomId = req.body["RoomID"];
+    let roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
 
     if (roomIndex === -1) {
         res.status(404).send({ error: "Room " + wantedRoomId + " not found."});
@@ -316,9 +355,9 @@ function validateRoom(req, res, rooms) {
 }
 
 function validatePlayerInRoom(req, res, rooms, roomId) {
-    var playerId = req.body["PlayerID"];
+    let playerId = req.body["PlayerID"];
 
-    var room = getRoom(req, rooms);
+    let room = getRoom(req, rooms);
     if (!validateRoomObject(res, room)) return false;
 
     // If player is not in room
@@ -331,7 +370,7 @@ function validatePlayerInRoom(req, res, rooms, roomId) {
 }
 
 function validateRoomOwner(req, res, rooms) {
-    var room = getRoom(req, rooms);
+    let room = getRoom(req, rooms);
     if (!validateRoomObject(res, rooms)) return false;
 
     if (room.hostPlayer !== req.body["PlayerID"]) {
@@ -343,7 +382,7 @@ function validateRoomOwner(req, res, rooms) {
 }
 
 function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal, sendResponse = true) {
-    var room = getRoom(req, rooms);
+    let room = getRoom(req, rooms);
     if (!validateRoomObject(res, room)) return false;
 
     if (room["inRoom"] !== inRoom || room["inGame"] !== inGame || room["inFinal"] !== inFinal) {
@@ -361,8 +400,8 @@ function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal, sendRespon
 }
 
 function getRoom(req, rooms) {
-    var wantedRoomId = req.body["RoomID"];
-    var roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
+    let wantedRoomId = req.body["RoomID"];
+    let roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
 
     if (roomIndex === -1) return null;
 
@@ -387,8 +426,8 @@ function getRandomPlayerName(room = null) {
         return PlayerNames[Math.floor(Math.random() * PlayerNames.length)];
     }
 
-    var playerNames = room["players"].map(player => player["name"]);
-    var chosenName = "";
+    let playerNames = room["players"].map(player => player["name"]);
+    let chosenName = "";
 
     if (room.players.length >= PlayerNames.length) {
         return "Player " + (Math.floor(Math.random() * 100) + 1).toString();
@@ -407,8 +446,8 @@ function getRandomPlayerColor(room = null) {
         return PlayerColors[Math.floor(Math.random() * PlayerColors.length)];
     }
 
-    var playerColors = room["players"].map(player => player["color"]);
-    var chosenColor = "";
+    let playerColors = room["players"].map(player => player["color"]);
+    let chosenColor = "";
 
     if (room.players.length >= PlayerColors.length) {
         console.log("Too many players in room.");
@@ -422,11 +461,56 @@ function getRandomPlayerColor(room = null) {
     return chosenColor;
 }
 
+function getPlayerPositions(room) {
+    let count = room.players.length;
+
+    let chosen = [];
+
+    for (let i = 0; i < count; i++) {
+        chosen.push(Positions[Math.floor(Math.random() * count)]);
+    }
+    
+    return chosen;
+}
+
+function getLineClues() {
+    let chosen = [];
+
+    let choice = "";
+    do {
+        choice = Words[Math.floor(Math.random() * Words.length)];
+        if (chosen.indexOf(choice) === -1) {
+            chosen.push(choice);
+        }
+    } while(chosen.length < 4)
+
+    return chosen;
+}
+
 function getSetStartTime(room) {
     if (!room) {
         return;
     }
 
-    room["startName"] = (new Date()).getTime() + 10000;
-    return room["startName"];
+    room["startTime"] = (new Date()).getTime() + ROUND_START_DELAY;
+    return room["startTime"];
+}
+
+function getSetEndTime(room) {
+    if (!room) {
+        return;
+    }
+
+    room["endTime"] = (new Date()).getTime() + ROUND_START_DELAY + ROUND_LENGTH;
+    return room["endTime"];
+}
+
+function shuffle(a) {
+    let j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
 }
