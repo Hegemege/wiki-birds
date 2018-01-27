@@ -3,7 +3,8 @@
   "ignore": [
     ".DS_Store",
     ".git",
-    "node_modules"
+    "node_modules",
+    "db.json"
   ],
   "verbose": false,
   "watch": [

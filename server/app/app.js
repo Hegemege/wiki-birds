@@ -65,7 +65,7 @@ module.exports = function() {
     app.use(cors());
 
     // Create database instance and start server
-    const adapter = new FileAsync("db.json");
+ //   const adapter = new FileAsync(path.resolve(__dirname, "db.json"));
 
     // Room servicing
     var rooms = [];
@@ -213,6 +213,7 @@ module.exports = function() {
         console.log("Room " + room["roomCode"] + " was started (" + room.players.length + " players)");
     });
 
+/*
     // API routes that touch the DB
     low(adapter)
         .then(db => {
@@ -222,7 +223,7 @@ module.exports = function() {
             // Set db default values
             return db.defaults({ todo: [] }).write();
         });
-
+*/
     return app;
 };
 
