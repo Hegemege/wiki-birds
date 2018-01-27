@@ -105,9 +105,9 @@ public class GameManager : MonoBehaviour
         StartCoroutine(RequestLeaveRoom(RoomCode));
     }
 
-    public void GetRoomInfo(Action<List<string>> callback)
+    public Coroutine GetRoomInfo(Action<List<string>> callback)
     {
-        StartCoroutine(RequestRoomInfo(RoomCode, callback));
+        return StartCoroutine(RequestRoomInfo(RoomCode, callback));
     }
     
     // Network methods

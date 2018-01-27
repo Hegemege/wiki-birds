@@ -23,6 +23,7 @@ public class RoomMenuUIController : MonoBehaviour
 
     private bool _gotRoomData;
     private Coroutine _infoCoroutine;
+    private Coroutine _innerCoroutine;
 
     void Awake()
     {
@@ -36,7 +37,7 @@ public class RoomMenuUIController : MonoBehaviour
     {
         while (true)
         {
-            GameManager.Instance.GetRoomInfo(UpdateRoomInfo);
+            _innerCoroutine = GameManager.Instance.GetRoomInfo(UpdateRoomInfo);
 
             yield return new WaitForSeconds(0.5f);
         }
@@ -65,6 +66,7 @@ public class RoomMenuUIController : MonoBehaviour
     public void LeaveButtonPressed()
     {
         StopCoroutine(_infoCoroutine);
+        StopCoroutine(_innerCoroutine);
         GameManager.Instance.LeaveRoom();
         LeaveButton.SetActive(false);
     }
