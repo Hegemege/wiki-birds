@@ -124,6 +124,7 @@ GameObject:
   - component: {fileID: 36615242}
   - component: {fileID: 36615241}
   - component: {fileID: 36615240}
+  - component: {fileID: 36615243}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -235,6 +236,23 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 36615238}
+--- !u!95 &36615243
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 36615238}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f30dac0e78b3a254cbb507a4b08cf658, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &72082182
 GameObject:
   m_ObjectHideFlags: 0
@@ -1348,6 +1366,7 @@ GameObject:
   - component: {fileID: 1744005478}
   - component: {fileID: 1744005477}
   - component: {fileID: 1744005476}
+  - component: {fileID: 1744005479}
   m_Layer: 5
   m_Name: RoomCodeButton
   m_TagString: Untagged
@@ -1448,6 +1467,23 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1744005474}
+--- !u!95 &1744005479
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1744005474}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f30dac0e78b3a254cbb507a4b08cf658, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &1786991533
 GameObject:
   m_ObjectHideFlags: 0
@@ -1533,6 +1569,7 @@ GameObject:
   - component: {fileID: 1840255859}
   - component: {fileID: 1840255858}
   - component: {fileID: 1840255857}
+  - component: {fileID: 1840255860}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -1655,6 +1692,23 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1840255855}
+--- !u!95 &1840255860
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1840255855}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f30dac0e78b3a254cbb507a4b08cf658, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &1957025796
 GameObject:
   m_ObjectHideFlags: 0

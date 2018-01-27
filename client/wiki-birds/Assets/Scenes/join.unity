@@ -1180,6 +1180,7 @@ GameObject:
   - component: {fileID: 909483810}
   - component: {fileID: 909483809}
   - component: {fileID: 909483808}
+  - component: {fileID: 909483811}
   m_Layer: 5
   m_Name: BackButton
   m_TagString: Untagged
@@ -1291,6 +1292,23 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 909483806}
+--- !u!95 &909483811
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 909483806}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f30dac0e78b3a254cbb507a4b08cf658, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &937414880
 GameObject:
   m_ObjectHideFlags: 0
@@ -2393,6 +2411,7 @@ GameObject:
   - component: {fileID: 1717358390}
   - component: {fileID: 1717358389}
   - component: {fileID: 1717358388}
+  - component: {fileID: 1717358391}
   m_Layer: 5
   m_Name: ConfirmButton
   m_TagString: Untagged
@@ -2504,6 +2523,23 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1717358386}
+--- !u!95 &1717358391
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1717358386}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: f30dac0e78b3a254cbb507a4b08cf658, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!1 &1744005474
 GameObject:
   m_ObjectHideFlags: 0
