@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class MainMenuUIController : MonoBehaviour
 {
@@ -65,4 +66,10 @@ public class MainMenuUIController : MonoBehaviour
     {
         GameManager.Instance.RetryConnection();
     }
+
+	public void Credits()
+	{
+		SceneManager.LoadScene ("credits");
+	}
+
 }
