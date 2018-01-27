@@ -14,12 +14,19 @@ class Room {
         this.lastUpdateTimeStamp = this.spawnTimeStamp;
         this.roomCode = roomCode;
         this.hostPlayer = hostPlayer;
-        this.players = [hostPlayer];
+        this.players = [new Player(getRandomPlayerName(), hostPlayer)];
         this.inRoom = true;
         this.inGame = false;
         this.inFinal = false;
         this.gameState = {};
         this.phoneLines = [];
+    }
+}
+
+class Player {
+    constructor(name, playerId) {
+        this.playerId = playerId;
+        this.name = name;
     }
 }
 
@@ -31,6 +38,18 @@ player
 
 
 */
+
+const PlayerNames = [
+    "Birdy Mc Birdface",
+    "Mr. Tweet",
+    "Ms. Songbird",
+    "Birdy Mc Birdface 2",
+    "Mr. Tweet 2",
+    "Ms. Songbird 2",
+    "Birdy Mc Birdface 3",
+    "Mr. Tweet 3",
+    "Ms. Songbird 3"
+];
 
 // Hardcoded token to cut away bots crawling semi-sensitive information
 // Does not secure anything, just makes sure that "most" of the traffic to the public API
@@ -83,7 +102,7 @@ module.exports = function() {
 
         rooms.push(newRoom);
 
-        res.status(200).send({ message: "success", roomCode: newRoomCode });
+        res.status(200).send({ message: "success", roomCode: newRoomCode, playerName: newRoom["players"][0]["name"] });
 
         console.log("Player " + hostPlayerID + " created room " + newRoomCode);
     });
@@ -100,15 +119,18 @@ module.exports = function() {
         var playerId = req.body["PlayerID"];
 
         // If player is already in room
-        if (rooms[roomIndex].players.indexOf(playerId) !== -1) {
+        if (rooms[roomIndex].players.findIndex(player => player["playerId"] === playerId) !== -1) {
             res.status(403).send({ error: "Player " + playerId + " already in room " + wantedRoomId});
             return;
         }
 
-        // Add player to room
-        rooms[roomIndex].players.push(playerId);
+        var room = getRoom(req, rooms);
 
-        res.status(200).send({ message: "success" })
+        // Add player to room
+        var newPlayer = new Player(getRandomPlayerName(room), playerId);
+        rooms[roomIndex].players.push(newPlayer);
+
+        res.status(200).send({ message: "success", playerName: newPlayer["name"] })
 
         console.log("Player " + playerId + " joined room " + wantedRoomId + " (total " + rooms[roomIndex].players.length + " players in room)");
     });
@@ -117,7 +139,6 @@ module.exports = function() {
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
         if (!validate(req, res, "RoomID", false)) return;
-
 
         if (!validateRoom(req, res, rooms)) return;
         if (!validateRoomOwner(req, res, rooms)) return;
@@ -198,7 +219,7 @@ function validatePlayerInRoom(req, res, rooms, roomId) {
     if (!validateRoomObject(res, room)) return false;
 
     // If player is not in room
-    if (room.players.indexOf(playerId) === -1) {
+    if (room.players.findIndex(player => player["playerId"] === playerId) === -1) {
         res.status(403).send({ error: "Player " + playerId + " not in room " + room["roomCode"]});
         return false;
     }
@@ -250,4 +271,24 @@ function validateRoomObject(res, room) {
 function getRandomRoomCode(currentRoomCodes) {
     return "1234"; // TEMP
     return Math.floor(Math.random()*10000).toString().padStart(4, "0");
+}
+
+function getRandomPlayerName(room = null) {
+    if (room === null) {
+        return PlayerNames[Math.floor(Math.random() * PlayerNames.length)];
+    }
+
+    var playerNames = room["players"].map(player => player["name"]);
+    var chosenName = "";
+
+    if (room.players.length >= PlayerNames.length) {
+        return "Player " + (Math.floor(Math.random() * 100) + 1).toString();
+    }
+
+    // Quick and dirty random name excluding the given names
+    do {
+        chosenName = PlayerNames[Math.floor(Math.random() * PlayerNames.length)];
+    } while (playerNames.indexOf(chosenName) !== -1)
+
+    return chosenName;
 }
