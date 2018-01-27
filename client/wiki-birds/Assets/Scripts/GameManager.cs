@@ -73,10 +73,14 @@ public class GameManager : MonoBehaviour
         StartCoroutine(CheckConnection());
     }
 
-    public void JoinGame()
+    public void GotoJoinRoom()
     {
-        Debug.Log("Join a game");
         SceneManager.LoadScene("join");
+    }
+
+    public void JoinRoom(string code)
+    {
+        StartCoroutine(RequestJoinRoom(code));
     }
 
     public void NewGame()
@@ -215,6 +219,7 @@ public class GameManager : MonoBehaviour
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
 
+                RoomCode = roomCode;
                 _playerName = responseBody["playerName"].ToString();
                 IsHost = false;
 

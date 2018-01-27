@@ -58,7 +58,7 @@ public class MainMenuUIController : MonoBehaviour
 
     public void JoinGameButtonClick()
     {
-        GameManager.Instance.JoinGame();
+        GameManager.Instance.GotoJoinRoom();
     }
 
     public void RetryButtonClick()

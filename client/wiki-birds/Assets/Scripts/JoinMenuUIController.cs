@@ -39,8 +39,7 @@ public class JoinMenuUIController : MonoBehaviour
             stringCode += code[i].ToString();
         }
 
-        GameManager.Instance.RoomCode = stringCode;
-        SceneManager.LoadScene("room");
+        GameManager.Instance.JoinRoom(stringCode);
     }
 
     void Update()
