@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: dd56ae9dac540c14283029ff8f8b58b1
-timeCreated: 1517059576
-licenseType: Pro
+timeCreated: 1517062711
+licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: blueBirb_0
@@ -101,11 +101,11 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 560
-        y: 234
+        y: 235
         width: 374
         height: 192
       alignment: 9
-      pivot: {x: 0.87210363, y: 0.45659733}
+      pivot: {x: 0.8743317, y: 0.4739585}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -119,7 +119,7 @@ TextureImporter:
         width: 379
         height: 175
       alignment: 9
-      pivot: {x: 0.12840815, y: 0.52857155}
+      pivot: {x: 0.13940205, y: 0.52857155}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
