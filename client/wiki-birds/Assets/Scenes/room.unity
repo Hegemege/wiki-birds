@@ -277,9 +277,8 @@ GameObject:
   - component: {fileID: 427087328}
   - component: {fileID: 427087327}
   - component: {fileID: 427087326}
-  - component: {fileID: 427087330}
   m_Layer: 5
-  m_Name: MainMenuUI
+  m_Name: RoomMenuUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -367,18 +366,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &427087330
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 427087325}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c02f933d90381ab419f194e88d0b57b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  UnableToConnectBG: {fileID: 1117090442}
 --- !u!1 &477680448
 GameObject:
   m_ObjectHideFlags: 0
