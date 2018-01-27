@@ -169,6 +169,30 @@ module.exports = function() {
         console.log("Player " + playerId + " left room " + room["roomCode"] + " (total " + room.players.length + " players in room)");
     });
 
+    app.put("/api/room-info", function(req, res) {
+        if (!validateToken(req, res)) return;
+        if (!validate(req, res, "PlayerID", false)) return;
+        if (!validate(req, res, "RoomID", false)) return;
+
+        if (!validateRoom(req, res, rooms)) return;
+
+        if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
+
+        var room = getRoom(req, rooms);
+
+        // Build an object representing the room data
+
+        var data = {
+            players: room.players.map(player => player["name"]),
+            host: room.hostPlayer,
+            roomCode: room.roomCode
+        }
+
+        res.status(200).send({ message: "success", "data": data })
+
+        console.log("Player " + req.body["PlayerID"] + " left room " + room["roomCode"] + " (total " + room.players.length + " players in room)");
+    });
+
     app.put("/api/start-room", function(req, res) {
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
@@ -308,7 +332,6 @@ function validateRoomObject(res, room) {
 }
 
 function getRandomRoomCode(currentRoomCodes) {
-    return "1234"; // TEMP
     return Math.floor(Math.random()*10000).toString().padStart(4, "0");
 }
 

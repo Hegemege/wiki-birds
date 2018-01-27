@@ -40,7 +40,8 @@ public class GameManager : MonoBehaviour
 
     // Identification data being sent to server
     private string _playerId;
-    private string _playerName;
+    [HideInInspector]
+    public string PlayerName;
 
     [HideInInspector]
     public bool IsHost;
@@ -69,6 +70,8 @@ public class GameManager : MonoBehaviour
     public void ResetToMenu()
     {
         IsHost = false;
+        RoomCode = "";
+        PlayerName = "";
         ConnectionStatus = 0;
         StartCoroutine(CheckConnection());
     }
@@ -104,12 +107,9 @@ public class GameManager : MonoBehaviour
         StartCoroutine(RequestLeaveRoom(RoomCode));
     }
 
-    /// <summary>
-    /// Perform initialization steps after connection to server was established.
-    /// </summary>
-    private void InitializeConnected()
+    public void GetRoomInfo(Action<List<string>> callback)
     {
-        //StartCoroutine(GetQuestionData());
+        StartCoroutine(RequestRoomInfo(RoomCode, callback));
     }
     
     // Network methods
@@ -185,13 +185,7 @@ public class GameManager : MonoBehaviour
             }
             else // Success
             {
-                var responseBody = JObject.Parse(request.downloadHandler.text);
-
-                IsHost = true;
-                RoomCode = responseBody["roomCode"].ToString();
-                _playerName = responseBody["playerName"].ToString();
-
-                SceneManager.LoadScene("room");
+                SceneManager.LoadScene("main");
             }
         }
     }
@@ -220,7 +214,7 @@ public class GameManager : MonoBehaviour
                 var responseBody = JObject.Parse(request.downloadHandler.text);
 
                 RoomCode = roomCode;
-                _playerName = responseBody["playerName"].ToString();
+                PlayerName = responseBody["playerName"].ToString();
                 IsHost = false;
 
                 SceneManager.LoadScene("room");
@@ -255,7 +249,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private IEnumerator RequestRoomInfo(string roomCode)
+    private IEnumerator RequestRoomInfo(string roomCode, Action<List<string>> callback)
     {
         object body = new
         {
@@ -276,7 +270,15 @@ public class GameManager : MonoBehaviour
             }
             else // Success
             {
-                
+                var responseBody = JObject.Parse(request.downloadHandler.text)["data"];
+
+                var players = responseBody["players"].ToObject<List<string>>();
+                var host = responseBody["host"].ToString();
+                var gotRoomCode = responseBody["roomCode"].ToString();
+
+                IsHost = host == _playerId;
+
+                callback(players);
             }
         }
     }
