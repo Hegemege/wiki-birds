@@ -325,16 +325,18 @@ function validateRoomOwner(req, res, rooms) {
     return true;
 }
 
-function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal) {
+function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal, sendResponse = true) {
     var room = getRoom(req, rooms);
     if (!validateRoomObject(res, room)) return false;
 
     if (room["inRoom"] !== inRoom || room["inGame"] !== inGame || room["inFinal"] !== inFinal) {
-        res.status(400).send({ error: "Room is in incorrect state: " + 
-            "inRoom: " +  room["inRoom"] + ", " +
-            "inGame: " +  room["inGame"] + ", " +
-            "inFinal: " +  room["inFinal"]
-        });
+        if (sendResponse) {
+            res.status(400).send({ error: "Room is in incorrect state: " + 
+                "inRoom: " +  room["inRoom"] + ", " +
+                "inGame: " +  room["inGame"] + ", " +
+                "inFinal: " +  room["inFinal"]
+            });
+        }
         return false;
     }
 
