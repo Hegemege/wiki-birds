@@ -11,4 +11,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15e26f35ce5929a47a2854505a244dc2, type: 3}
   m_Name: Production
   m_EditorClassIdentifier: 
-  ApiURL: https://wikibirds.tk/api/api
+  ApiURL: https://wikibirds.tk/api

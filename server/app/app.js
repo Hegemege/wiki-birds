@@ -82,8 +82,8 @@ module.exports = function() {
 
     // Main api page, acts as a ping endpoint
     app.get("/api", function(req, res) {
-        res.setHeader("Content-Type", "text/html; charset=utf-8");
-        res.end("Wikibirds API");
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).send({ message: "success" });
     });
 
     // Rooms
