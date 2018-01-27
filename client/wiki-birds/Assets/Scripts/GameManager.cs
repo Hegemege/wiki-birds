@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -20,6 +21,9 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector]
     public int ConnectionStatus;
+
+    [HideInInspector]
+    public int RoomConnection;
 
     [HideInInspector]
     public string ErrorMessage;
@@ -86,6 +90,16 @@ public class GameManager : MonoBehaviour
         ResetToMenu();
     }
 
+    public void StartRoom()
+    {
+        StartCoroutine(RequestStartRoom());
+    }
+
+    public void LeaveRoom()
+    {
+        StartCoroutine(RequestLeaveRoom(RoomCode));
+    }
+
     /// <summary>
     /// Perform initialization steps after connection to server was established.
     /// </summary>
@@ -143,6 +157,95 @@ public class GameManager : MonoBehaviour
                 RoomCode = responseBody["roomCode"].ToString();
 
                 SceneManager.LoadScene("room");
+            }
+        }
+    }
+
+    private IEnumerator RequestStartRoom()
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/new-room", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                IsHost = true;
+                RoomCode = responseBody["roomCode"].ToString();
+                _playerName = responseBody["playerName"].ToString();
+
+                SceneManager.LoadScene("room");
+            }
+        }
+    }
+
+    private IEnumerator RequestJoinRoom(string roomCode)
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId,
+            RoomID = roomCode
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/join-room", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                _playerName = responseBody["playerName"].ToString();
+                IsHost = false;
+
+                SceneManager.LoadScene("room");
+            }
+        }
+    }
+
+    private IEnumerator RequestLeaveRoom(string roomCode)
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId,
+            RoomID = roomCode
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/leave-room", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {                
+                ResetToMenu();
+                SceneManager.LoadScene("main");
             }
         }
     }
