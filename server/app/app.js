@@ -188,9 +188,7 @@ module.exports = function() {
             roomCode: room.roomCode
         }
 
-        res.status(200).send({ message: "success", "data": data })
-
-        console.log("Player " + req.body["PlayerID"] + " left room " + room["roomCode"] + " (total " + room.players.length + " players in room)");
+        res.status(200).send({ message: "success", "data": data });
     });
 
     app.put("/api/start-room", function(req, res) {
@@ -333,7 +331,7 @@ function validateRoomObject(res, room) {
 }
 
 function getRandomRoomCode(currentRoomCodes) {
-    return Math.floor(Math.random()*10000).toString().padStart(4, "0");
+    return String("0000" + Math.floor(Math.random()*10000).toString()).slice(-4);
 }
 
 function getRandomPlayerName(room = null) {
