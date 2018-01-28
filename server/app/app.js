@@ -32,6 +32,7 @@ class Player {
         this.color = color;
         this.lineIndex = -1;
         this.word = "";
+        this.lineIndexUpdateTimestamp = (new Date()).getTime();
     }
 }
 
@@ -288,6 +289,8 @@ module.exports = function() {
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
         if (!validate(req, res, "RoomID", false)) return;
+        if (!validate(req, res, "LineIndex", true)) return;
+        if (!validate(req, res, "LineIndexUpdateTimestamp", true)) return;
 
         if (!validateRoom(req, res, rooms)) return;
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
@@ -296,6 +299,19 @@ module.exports = function() {
         let room = getRoom(req, rooms);
 
         room.lastUpdateTimeStamp = (new Date()).getTime();
+
+        // Update the given line index
+        let playerIndex = room["players"].findIndex(player => player["playerId"] === req.body["PlayerID"]);
+        if (playerIndex !== -1) {
+            var player = room["players"][playerIndex];
+
+            var gotTimestamp = req.body["LineIndexUpdateTimestamp"];
+            if (player["lineIndexUpdateTimestamp"] < gotTimestamp) {
+                // Do update
+                player["lineIndexUpdateTimestamp"] = gotTimestamp;
+                player["lineIndex"] = req.body["LineIndex"];
+            }
+        }
 
         res.status(200).send(room);
     });

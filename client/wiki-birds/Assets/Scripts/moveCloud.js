@@ -6,15 +6,15 @@
      
      
     function Update () {
-    //amount to move cloud
-    amtToMove = Time.deltaTime *speed;
-    //move enemy
-    transform.Translate(Vector3.right * amtToMove);
-    //respawn with random Y
-    if (transform.position.x > offscreen) {
+		//amount to move cloud
+		var amtToMove = Time.deltaTime *speed;
+		//move enemy
+		transform.Translate(Vector3.right * amtToMove);
+		//respawn with random Y
+		if (transform.position.x > offscreen) {
        
-        transform.position.x = spawn;
-        transform.position.y = Random.Range (highest , lowest);
+			transform.position.x = spawn;
+			transform.position.y = Random.Range (highest , lowest);
      
-        }
+			}
     }
