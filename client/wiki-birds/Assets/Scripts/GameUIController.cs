@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +16,11 @@ public class GameUIController : MonoBehaviour
 
     public RectTransform UpButton;
     public RectTransform DownButton;
+
+    public Image Timer1;
+    public Image Timer2;
+
+    public List<Sprite> Numbers;
 
     public List<Transform> SpawnAnchorsVertical;
     public List<Transform> SpawnAnchorsHorizontal;
@@ -40,6 +46,9 @@ public class GameUIController : MonoBehaviour
     private List<BirdController> _otherBirdControllers;
 
     private bool _initialData;
+    private Coroutine _gameLoop;
+
+    private int _roundNumber;
 
     void Awake()
     {
@@ -112,7 +121,7 @@ public class GameUIController : MonoBehaviour
         }
 
 
-        StartCoroutine(GetGameInfo());
+        _gameLoop = StartCoroutine(GetGameInfo());
     }
 
     private IEnumerator GetGameInfo()
@@ -184,10 +193,10 @@ public class GameUIController : MonoBehaviour
             // We dont care about the words of others right now
             // TODO: score screen should show everyone's words in the end?
 
-            // TODO: Round number
             // Get round number
-            // TODO: round number music
+            _roundNumber = data["round"].ToObject<int>();
 
+            // TODO: round number music
 
             return;
         }
@@ -201,6 +210,67 @@ public class GameUIController : MonoBehaviour
             var birdLineIndex = playerPositions.Single(pos => pos.Color == other.Color).LineIndex;
 
             other.TargetLine = birdLineIndex;
+        }
+
+
+    }
+
+    private void TimeOut()
+    {
+        StopCoroutine(_gameLoop);
+
+        // Show scores
+        // TODO
+    }
+
+    void Update()
+    {
+        var now = DateTime.UtcNow;
+        if (now > GameManager.Instance.NextRoundStart)
+        {
+            Timer1.gameObject.SetActive(true);
+            Timer2.gameObject.SetActive(true);
+
+            if (now < GameManager.Instance.NextRoundEnd)
+            {
+                UpButton.gameObject.SetActive(true);
+                DownButton.gameObject.SetActive(true);
+            }
+            else
+            {
+                UpButton.gameObject.SetActive(false);
+                DownButton.gameObject.SetActive(false);
+            }
+
+            var timeleft = GameManager.Instance.NextRoundEnd - now;
+
+            if (timeleft.TotalMilliseconds < 100f)
+            {
+                Timer1.sprite = Numbers[0];
+                Timer2.sprite = Numbers[0];
+
+                TimeOut();
+            }
+            else
+            {
+                var leftSeconds = timeleft.TotalSeconds;
+                var leftFullSeconds = Mathf.CeilToInt((float)leftSeconds);
+                var leftTens = Mathf.FloorToInt(leftFullSeconds / 10f);
+                var leftOnes = leftFullSeconds % 10;
+
+                Timer1.sprite = Numbers[leftTens];
+                Timer2.sprite = Numbers[leftOnes];
+            }
+
+
+        }
+        else
+        {
+            Timer1.gameObject.SetActive(false);
+            Timer2.gameObject.SetActive(false);
+
+            UpButton.gameObject.SetActive(false);
+            DownButton.gameObject.SetActive(false);
         }
 
 
