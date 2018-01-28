@@ -83,7 +83,7 @@ const token = "9QfdXsTwmOPySh1zaB8A";
 const MIN_PLAYER_COUNT = 2;
 const MAX_PLAYER_COUNT = 4;
 
-const ROUND_START_DELAY = 3 * 1000;
+const ROUND_START_DELAY = 10 * 1000;
 const ROUND_LENGTH = 5 * 1000;
 
 module.exports = function() {
@@ -294,6 +294,14 @@ module.exports = function() {
 
         if (!validateRoom(req, res, rooms)) return;
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
+
+
+        // If room has ended, inform
+        if (validateRoomStatus(req, res, rooms, false, false, true, false)) {
+            res.status(200).send({ message: "ended" });
+            return;
+        }
+
         if (!validateRoomStatus(req, res, rooms, false, true, false)) return;
 
         let room = getRoom(req, rooms);
@@ -314,7 +322,28 @@ module.exports = function() {
             }   
         }
 
+        room["message"] = "playing";
+
         res.status(200).send(room);
+    });
+
+    app.put("/api/end-round", function(req, res) {
+        if (!validateToken(req, res)) return;
+        if (!validate(req, res, "PlayerID", false)) return;
+        if (!validate(req, res, "RoomID", false)) return;
+
+        if (!validateRoom(req, res, rooms)) return;
+        if (!validateRoomOwner(req, res, rooms)) return;
+        if (!validateRoomStatus(req, res, rooms, false, true, false)) return;
+
+        let room = getRoom(req, rooms);
+
+        room["inGame"] = false;
+        room["inFinal"] = true;
+
+        res.status(200).send({ message: "success" });
+
+        console.log("End round " + room["round"] + " in room " + room["roomCode"]);
     });
 
 /*

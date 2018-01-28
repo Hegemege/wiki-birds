@@ -20,6 +20,15 @@ public class GameUIController : MonoBehaviour
     public Image Timer1;
     public Image Timer2;
 
+    public GameObject ReadyBG;
+    public GameObject ReadyImage;
+    public GameObject Round1;
+    public GameObject Round2;
+    public GameObject Round3;
+
+    public List<AudioClip> RoundMusics;
+    public AudioSource RoundMusicPlayer;
+
     public List<Sprite> Numbers;
 
     public List<Transform> SpawnAnchorsVertical;
@@ -49,6 +58,8 @@ public class GameUIController : MonoBehaviour
     private Coroutine _gameLoop;
 
     private int _roundNumber;
+    private bool _roundEnded;
+    private int _roundIndex;
 
     void Awake()
     {
@@ -196,7 +207,11 @@ public class GameUIController : MonoBehaviour
             // Get round number
             _roundNumber = data["round"].ToObject<int>();
 
-            // TODO: round number music
+            _roundIndex = _roundNumber - 1;
+
+            RoundMusicPlayer.clip = RoundMusics[_roundIndex];
+
+            ReadyImage.SetActive(true);
 
             return;
         }
@@ -217,10 +232,21 @@ public class GameUIController : MonoBehaviour
 
     private void TimeOut()
     {
-        StopCoroutine(_gameLoop);
+        if (_roundEnded) return;
 
-        // Show scores
-        // TODO
+        _roundEnded = true;
+        //StopCoroutine(_gameLoop);
+
+            // Show scores
+            // TODO
+        StartCoroutine(GoToScore());
+    }
+
+    private IEnumerator GoToScore()
+    {
+        yield return new WaitForSeconds(2f);
+
+        GameManager.Instance.EndRound();
     }
 
     void Update()
@@ -230,6 +256,8 @@ public class GameUIController : MonoBehaviour
         {
             Timer1.gameObject.SetActive(true);
             Timer2.gameObject.SetActive(true);
+
+            ReadyBG.SetActive(false);
 
             if (now < GameManager.Instance.NextRoundEnd)
             {
@@ -261,16 +289,39 @@ public class GameUIController : MonoBehaviour
                 Timer1.sprite = Numbers[leftTens];
                 Timer2.sprite = Numbers[leftOnes];
             }
-
-
         }
         else
         {
             Timer1.gameObject.SetActive(false);
             Timer2.gameObject.SetActive(false);
 
+            ReadyBG.SetActive(true);
+
             UpButton.gameObject.SetActive(false);
             DownButton.gameObject.SetActive(false);
+
+            if ((GameManager.Instance.NextRoundStart - now).TotalSeconds > 5f)
+            {
+                ReadyImage.SetActive(true);
+            }
+            else
+            {
+                ReadyImage.SetActive(false);
+                if (_roundIndex == 0)
+                {
+                    Round1.SetActive(true);
+                }
+
+                if (_roundIndex == 1)
+                {
+                    Round2.SetActive(true);
+                }
+
+                if (_roundIndex == 2)
+                {
+                    Round3.SetActive(true);
+                }
+            }
         }
 
 
