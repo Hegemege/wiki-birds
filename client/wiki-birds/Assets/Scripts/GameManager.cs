@@ -390,6 +390,40 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private IEnumerator RequestRoundInfo(Action<JObject> callback)
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId,
+            RoomID = RoomCode,
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/round-info", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {
+                // Wait for room-info to get us the message
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["message"].ToObject<string>().Equals("ended"))
+                {
+                    SceneManager.LoadScene("game");
+                }
+
+                callback(responseBody);
+            }
+        }
+    }
+
     private void HandleRequestError(UnityWebRequest request)
     {
         ConnectionStatus = 3;

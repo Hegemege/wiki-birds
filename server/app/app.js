@@ -33,6 +33,7 @@ class Player {
         this.lineIndex = -1;
         this.word = "";
         this.lineIndexUpdateTimestamp = (new Date()).getTime();
+        this.points = 0;
     }
 }
 
@@ -169,7 +170,10 @@ module.exports = function() {
 
         if (!validateRoom(req, res, rooms)) return;
 
-        if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
+        if (!validateRoomStatus(req, res, rooms, true, false, false, false)) {
+            res.status(400).send({ error: "Room cannot be joined" });
+            return;
+        };
 
         let wantedRoomId = req.body["RoomID"];
         let roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
@@ -365,9 +369,39 @@ module.exports = function() {
         room["inGame"] = false;
         room["inFinal"] = true;
 
+        // Calculate scores
+        for (let i = 0; i < room["players"].length; i++) {
+            let lineIndex = room["players"][i]["lineIndex"];
+            let word = room["players"][i]["word"];
+
+            if (room["correctLines"].indexOf(word) === lineIndex) {
+                room["players"][i]["points"] += 1;
+            }
+        }
+
         res.status(200).send({ message: "success" });
 
         console.log("End round " + room["round"] + " in room " + room["roomCode"]);
+    });
+
+    app.put("/api/round-info", function(req, res) {
+        if (!validateToken(req, res)) return;
+        if (!validate(req, res, "PlayerID", false)) return;
+        if (!validate(req, res, "RoomID", false)) return;
+
+        if (!validateRoom(req, res, rooms)) return;
+
+        // If room has ended, inform
+        if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
+            res.status(200).send({ message: "ended" });
+            return;
+        }
+
+        if (!validateRoomStatus(req, res, rooms, false, false, true)) return;
+
+        let room = getRoom(req, rooms);
+
+        res.status(200).send(room);
     });
 
 /*
