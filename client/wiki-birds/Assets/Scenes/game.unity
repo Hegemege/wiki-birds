@@ -1362,15 +1362,37 @@ MonoBehaviour:
   LineSound: {fileID: 90620233}
   CorrectLines: []
   Words:
-  - Word 1
-  - Word 2
-  - Word 3
-  - Word 4
+  - Limnonectes khammonensis
+  - Tabapuan
+  - Bunting
+  - Dichomeris inserrata
+  - Euthanasia rollercoaster
+  - Spite house
+  - Toilet paper orientation
+  - Emu war
+  - Cosmic latte
+  - Evil clown
+  - Dodo
+  - Extreme ironing
+  - Witzelsucht
+  - Mondegreen
+  - Cow tipping
   Clips:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 8300000, guid: 7e30d6955b50d8042bbe8e7211cae487, type: 3}
+  - {fileID: 8300000, guid: 22e2942869ed56745876800c2976b22f, type: 3}
+  - {fileID: 8300000, guid: 52c5b3d83b3e779419efbfe8a714adf3, type: 3}
+  - {fileID: 8300000, guid: a021016e2281d06479cb986634e7dfaa, type: 3}
+  - {fileID: 8300000, guid: 6f5a3e8dc0ec5544ca77c920a125807e, type: 3}
+  - {fileID: 8300000, guid: d9c1db9a0733b4c4a88d575a003c32c8, type: 3}
+  - {fileID: 8300000, guid: 74be11baa8970ba4cac81a50d9fd8721, type: 3}
+  - {fileID: 8300000, guid: 5db7f8f117fcdd046a10c564a1281be8, type: 3}
+  - {fileID: 8300000, guid: 88073c091828dee4cbf3212d0d8d0804, type: 3}
+  - {fileID: 8300000, guid: 94063d9e6d431e14998c12bd1e6f0ed9, type: 3}
+  - {fileID: 8300000, guid: d2f5dbe30c332294f90beb006968a8aa, type: 3}
+  - {fileID: 8300000, guid: ab4606dd8d8d8204c9b56dc49c8b2f64, type: 3}
+  - {fileID: 8300000, guid: 081f757bf2a54754a8f7cd19edf6fde3, type: 3}
+  - {fileID: 8300000, guid: bd52a4627a424d94caaaba095b234100, type: 3}
+  - {fileID: 8300000, guid: e18c2308dddfd2148b89887f3b24cddc, type: 3}
 --- !u!4 &932353397
 Transform:
   m_ObjectHideFlags: 0
