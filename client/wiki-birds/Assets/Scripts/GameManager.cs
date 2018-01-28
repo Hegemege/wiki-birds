@@ -503,11 +503,11 @@ public class GameManager : MonoBehaviour
         ConnectionStatus = 3;
         try
         {
-            // Error after initial connection check, go to menu and show error
-            if (request.isHttpError)
-            {
-                var responseBody = JObject.Parse(request.downloadHandler.text);
+            var responseBody = JObject.Parse(request.downloadHandler.text);
 
+            // Error after initial connection check, go to menu and show error
+            if (request.isHttpError || responseBody["error"] != null)
+            {
                 ErrorMessage = "Error: " + responseBody["error"];
             }
         }
