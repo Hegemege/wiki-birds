@@ -286,6 +286,7 @@ module.exports = function() {
     });
 
     app.put("/api/game-info", function(req, res) {
+        console.log(req.body);
         if (!validateToken(req, res)) return;
         if (!validate(req, res, "PlayerID", false)) return;
         if (!validate(req, res, "RoomID", false)) return;
@@ -305,12 +306,17 @@ module.exports = function() {
         if (playerIndex !== -1) {
             var player = room["players"][playerIndex];
 
+            console.log("new player line", req.body["LineIndex"], player, req.body["    LineIndexUpdateTimestamp"]);
+
             var gotTimestamp = req.body["LineIndexUpdateTimestamp"];
             if (player["lineIndexUpdateTimestamp"] < gotTimestamp) {
                 // Do update
+
+                
+
                 player["lineIndexUpdateTimestamp"] = gotTimestamp;
                 player["lineIndex"] = req.body["LineIndex"];
-            }
+            }   
         }
 
         res.status(200).send(room);
@@ -349,7 +355,7 @@ function isNumeric(n) {
  * the field string must resolve to a valid number.
  */
 function validate(req, res, field, numeric) {
-    if (!req.body[field]) {
+    if (req.body[field] === undefined) {
         res.status(400).send({ error: field + " not found in request body" });
         return false;
     }

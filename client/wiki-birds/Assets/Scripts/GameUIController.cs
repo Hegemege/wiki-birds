@@ -89,6 +89,8 @@ public class GameUIController : MonoBehaviour
         _myBirdController.Color = GameManager.Instance.PlayerColor;
         _myBirdController.HorizontalIndex = myIndex;
 
+        GameManager.Instance.MyBirdController = _myBirdController;
+
         // Generate other birds
         foreach (var other in otherPrefabs)
         {

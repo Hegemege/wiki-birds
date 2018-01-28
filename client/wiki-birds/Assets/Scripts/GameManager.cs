@@ -331,7 +331,6 @@ public class GameManager : MonoBehaviour
             Token = Token,
             PlayerID = _playerId,
             RoomID = RoomCode,
-            // TODO: player actions
             LineIndex = MyBirdController != null ? MyBirdController.TargetLine : -1,
             LineIndexUpdateTimestamp = new DateTime().ToUniversalTime().Subtract(
                 new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
