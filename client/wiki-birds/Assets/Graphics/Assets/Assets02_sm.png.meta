@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 28018ffc20bef4793b9f1949088cb681
-timeCreated: 1517061172
+timeCreated: 1517141931
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -21,6 +21,7 @@ TextureImporter:
     21300028: Arrow_green
     21300030: Arrow_red
     21300032: Pole_2
+    21300034: Arrow_game
   externalObjects: {}
   serializedVersion: 4
   mipmaps:
@@ -340,6 +341,20 @@ TextureImporter:
         height: 753
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Arrow_game
+      rect:
+        serializedVersion: 2
+        x: 206
+        y: 2
+        width: 107
+        height: 116
+      alignment: 9
+      pivot: {x: 0.5547813, y: 0.48105058}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
