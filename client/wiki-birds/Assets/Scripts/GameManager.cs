@@ -194,6 +194,12 @@ public class GameManager : MonoBehaviour
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
 
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
+
                 IsHost = true;
                 RoomCode = responseBody["roomCode"].ToString();
                 PlayerName = responseBody["playerName"].ToString();
@@ -225,6 +231,13 @@ public class GameManager : MonoBehaviour
             }
             else // Success
             {
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
                 // Next update of room-info will transfer all players to game
             }
         }
@@ -252,6 +265,12 @@ public class GameManager : MonoBehaviour
             else // Success
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
 
                 RoomCode = roomCode;
                 PlayerName = responseBody["playerName"].ToString();
@@ -283,7 +302,15 @@ public class GameManager : MonoBehaviour
                 HandleRequestError(request);
             }
             else // Success
-            {                
+            {
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
+
                 ResetToMenu();
                 SceneManager.LoadScene("main");
             }
@@ -312,6 +339,12 @@ public class GameManager : MonoBehaviour
             else // Success
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
 
                 if (responseBody["message"].ToString().Equals("started"))
                 {
@@ -366,6 +399,12 @@ public class GameManager : MonoBehaviour
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
 
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
+
                 if (responseBody["message"].ToObject<string>().Equals("ended"))
                 {
                     SceneManager.LoadScene("score");
@@ -398,6 +437,13 @@ public class GameManager : MonoBehaviour
             else // Success
             {
                 // Wait for room-info to get us the message
+                var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
             }
         }
     }
@@ -425,6 +471,12 @@ public class GameManager : MonoBehaviour
             {
                 // Wait for room-info to get us the message
                 var responseBody = JObject.Parse(request.downloadHandler.text);
+
+                if (responseBody["error"] != null)
+                {
+                    HandleRequestError(request);
+                    yield break;
+                }
 
                 if (responseBody["message"].ToObject<string>().Equals("ended"))
                 {
@@ -456,7 +508,7 @@ public class GameManager : MonoBehaviour
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
 
-                ErrorMessage = "Error " + request.responseCode + ": " + responseBody["error"];
+                ErrorMessage = "Error: " + responseBody["error"];
             }
         }
         catch (Exception ex)

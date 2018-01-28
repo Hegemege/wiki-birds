@@ -171,7 +171,7 @@ module.exports = function() {
         if (!validateRoom(req, res, rooms)) return;
 
         if (!validateRoomStatus(req, res, rooms, true, false, false, false)) {
-            res.status(400).send({ error: "Room cannot be joined" });
+            res.status(200).send({ error: "Room cannot be joined" });
             return;
         };
 
@@ -181,14 +181,14 @@ module.exports = function() {
 
         // If player is already in room
         if (rooms[roomIndex].players.findIndex(player => player["playerId"] === playerId) !== -1) {
-            res.status(400).send({ error: "Player " + playerId + " already in room " + wantedRoomId});
+            res.status(200).send({ error: "Player " + playerId + " already in room " + wantedRoomId});
             return;
         }
 
         let room = getRoom(req, rooms);
 
         if (room.hostPlayer === null) {
-            res.status(400).send({ error: "Room abandoned. "});
+            res.status(200).send({ error: "Room abandoned. "});
             return;
         }
 
@@ -273,7 +273,7 @@ module.exports = function() {
 
         if (!validateRoomStatus(req, res, rooms, true, false, false, false)) {
             if (!validateRoomStatus(req, res, rooms, false, false, true, false)) {
-                res.status(400).send({ error: "Unable to start room." });
+                res.status(200).send({ error: "Unable to start room." });
                 return;
             }
         }
@@ -281,12 +281,12 @@ module.exports = function() {
         let room = getRoom(req, rooms);
 
         if (room.players.length < MIN_PLAYER_COUNT) {
-            res.status(400).send({ error: "Too few players in room. Minimum " + MIN_PLAYER_COUNT });
+            res.status(200).send({ error: "Too few players in room. Minimum " + MIN_PLAYER_COUNT });
             return;
         }
 
         if (room.players.length > MAX_PLAYER_COUNT) {
-            res.status(400).send({ error: "Too many players in room. Maximum " + MAX_PLAYER_COUNT });
+            res.status(200).send({ error: "Too many players in room. Maximum " + MAX_PLAYER_COUNT });
             return;
         }
 
@@ -432,7 +432,7 @@ module.exports = function() {
 
 function validateToken(req, res) {
     if (req.body["Token"] !== token) {
-        res.status(403).send({ error: "Invalid token in request body"});
+        res.status(200).send({ error: "Invalid token in request body"});
         return false;
     }
 
@@ -450,12 +450,12 @@ function isNumeric(n) {
  */
 function validate(req, res, field, numeric) {
     if (req.body[field] === undefined) {
-        res.status(400).send({ error: field + " not found in request body" });
+        res.status(200).send({ error: field + " not found in request body" });
         return false;
     }
 
     if (numeric && !isNumeric(req.body[field])) {
-        res.status(400).send({ error: field + " is not numeric" });
+        res.status(200).send({ error: field + " is not numeric" });
         return false;
     }
 
@@ -482,7 +482,7 @@ function validatePlayerInRoom(req, res, rooms, roomId) {
 
     // If player is not in room
     if (room.players.findIndex(player => player["playerId"] === playerId) === -1) {
-        res.status(400).send({ error: "Player " + playerId + " not in room " + room["roomCode"]});
+        res.status(200).send({ error: "Player " + playerId + " not in room " + room["roomCode"]});
         return false;
     }
 
@@ -494,7 +494,7 @@ function validateRoomOwner(req, res, rooms) {
     if (!validateRoomObject(res, rooms)) return false;
 
     if (room.hostPlayer !== req.body["PlayerID"]) {
-        res.status(400).send({ error: "Player " + req.body["PlayerID"] + " is not the owner of room " + room["roomCode"]});
+        res.status(200).send({ error: "Player " + req.body["PlayerID"] + " is not the owner of room " + room["roomCode"]});
         return false;
     }
 
@@ -507,7 +507,7 @@ function validateRoomStatus(req, res, rooms, inRoom, inGame, inFinal, sendRespon
 
     if (room["inRoom"] !== inRoom || room["inGame"] !== inGame || room["inFinal"] !== inFinal) {
         if (sendResponse) {
-            res.status(400).send({ error: "Room is in incorrect state: " + 
+            res.status(200).send({ error: "Room is in incorrect state: " + 
                 "inRoom: " +  room["inRoom"] + ", " +
                 "inGame: " +  room["inGame"] + ", " +
                 "inFinal: " +  room["inFinal"]
