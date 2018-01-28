@@ -50,22 +50,46 @@ const Positions = [
 ];
 
 const Words = [
-    "Word 1",
-    "Word 2",
-    "Word 3",
-    "Word 4"
+    "Limnonectes khammonensis",
+    "Tabapuan",
+    "Bunting",
+    "Dichomeris inserrata",
+    "Euthanasia rollercoaster",
+    "Spite house",
+    "Toilet paper orientation",
+    "Emu war",
+    "Cosmic latte",
+    "Evil clown",
+    "Dodo",
+    "Extreme ironing",
+    "Witzelsucht",
+    "Mondegreen",
+    "Cow tipping"
 ];
 
 const PlayerNames = [
     "Birdy Mc Birdface",
-    "Mr. Tweet",
     "Ms. Songbird",
-    "Birdy Mc Birdface 2",
-    "Mr. Tweet 2",
-    "Ms. Songbird 2",
-    "Birdy Mc Birdface 3",
-    "Mr. Tweet 3",
-    "Ms. Songbird 3"
+    "Mr. Tweet",
+    "Justin Birber",
+    "Bob",
+    "James Birb",
+    "Birbenstein",
+    "Bob the Birber",
+    "Birbman",
+    "Just Bob",
+    "Birbedy",
+    "Wilson",
+    "Laura Birbon",
+    "Marie Mallard",
+    "Henry the Birb",
+    "Harbirb",
+    "PIPIPI",
+    "Athina Birbiana",
+    "Birbl",
+    "Tweedly",
+    "Birbedy Bob"
+
 ];
 
 const PlayerColors = [
