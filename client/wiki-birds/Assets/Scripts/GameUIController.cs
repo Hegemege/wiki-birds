@@ -445,8 +445,8 @@ public class GameUIController : MonoBehaviour
 
     private int GetHorizontalIndex(GameObject prefab)
     {
-        if (prefab == RedBirdPrefab) return 0;
-        if (prefab == YellowBirdPrefab) return 1;
+        if (prefab == RedBirdPrefab) return 1;
+        if (prefab == YellowBirdPrefab) return 0;
         if (prefab == GreenBirdPrefab) return 2;
         if (prefab == BlueBirdPrefab) return 3;
 
