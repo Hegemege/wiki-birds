@@ -210,6 +210,7 @@ public class GameUIController : MonoBehaviour
             _roundIndex = _roundNumber - 1;
 
             RoundMusicPlayer.clip = RoundMusics[_roundIndex];
+            RoundMusicPlayer.Play();
 
             ReadyImage.SetActive(true);
 
@@ -263,11 +264,38 @@ public class GameUIController : MonoBehaviour
             {
                 UpButton.gameObject.SetActive(true);
                 DownButton.gameObject.SetActive(true);
+
+                if (_myBirdController.CurrentLine == _myBirdController.TargetLine)
+                {
+                    var currentWord = CorrectLines[_myBirdController.CurrentLine];
+                    var clipIndex = Words.IndexOf(currentWord);
+                    if (clipIndex != -1)
+                    {
+                        if (!LineSound.isPlaying)
+                        {
+                            LineSound.clip = Clips[clipIndex];
+                            LineSound.Play();
+                        }
+                    }
+                    else
+                    {
+                        LineSound.Stop();
+                        // Shouldnt happen
+                    }
+                }
+                else
+                {
+                    LineSound.Stop();
+                }
+                
+                
             }
             else
             {
                 UpButton.gameObject.SetActive(false);
                 DownButton.gameObject.SetActive(false);
+
+                LineSound.Stop();
             }
 
             var timeleft = GameManager.Instance.NextRoundEnd - now;
