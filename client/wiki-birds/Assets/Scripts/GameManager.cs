@@ -332,9 +332,7 @@ public class GameManager : MonoBehaviour
             PlayerID = _playerId,
             RoomID = RoomCode,
             LineIndex = MyBirdController != null ? MyBirdController.TargetLine : -1,
-            LineIndexUpdateTimestamp = new DateTime().ToUniversalTime().Subtract(
-                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-            ).TotalMilliseconds
+            LineIndexUpdateTimestamp = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds
         };
 
         using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/game-info", JsonConvert.SerializeObject(body)))
