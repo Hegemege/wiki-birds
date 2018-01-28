@@ -29,6 +29,9 @@ public class GameUIController : MonoBehaviour
     public List<AudioClip> RoundMusics;
     public AudioSource RoundMusicPlayer;
 
+    public List<AudioClip> RoundStartClips;
+    public AudioSource RoundStartMusic;
+
     public List<Sprite> Numbers;
 
     public List<Transform> SpawnAnchorsVertical;
@@ -221,6 +224,9 @@ public class GameUIController : MonoBehaviour
                 RoundMusicPlayer.clip = RoundMusics[_roundIndex];
                 RoundMusicPlayer.Play();
 
+                RoundStartMusic.clip = RoundStartClips[_roundIndex];
+                RoundStartMusic.Play();
+
                 ReadyImage.SetActive(true);
 
                 return;
@@ -276,8 +282,8 @@ public class GameUIController : MonoBehaviour
 
             if (now < GameManager.Instance.NextRoundEnd)
             {
-                UpButton.gameObject.SetActive(true);
-                DownButton.gameObject.SetActive(true);
+                UpButton.gameObject.SetActive(GameManager.Instance.MyBirdController.CurrentLine != 0);
+                DownButton.gameObject.SetActive(GameManager.Instance.MyBirdController.CurrentLine != 3);
 
                 if (_myBirdController.CurrentLine == _myBirdController.TargetLine)
                 {
@@ -377,8 +383,8 @@ public class GameUIController : MonoBehaviour
         Vector2 localPoint;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(CanvasRef.transform as RectTransform, birdScreenPosition, CameraRef, out localPoint);
 
-        UpButton.anchoredPosition = localPoint + new Vector2(0f, 200f);
-        DownButton.anchoredPosition = localPoint - new Vector2(0f, 200f);
+        UpButton.anchoredPosition = localPoint + new Vector2(0f, 300f);
+        DownButton.anchoredPosition = localPoint - new Vector2(0f, 100f);   
 
         // Bird movement
         MoveBird(_myBird, _myBirdController, dt);
