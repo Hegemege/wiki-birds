@@ -240,16 +240,17 @@ module.exports = function() {
 
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
 
+        let room = getRoom(req, rooms);
+
         // If room is no longer in room state, tell client to go to game
         if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
-            let room = getRoom(req, rooms);
             res.status(200).send({ message: "started", now: (new Date()).getTime(), startTime: room["startTime"], endTime: room["endTime"] });
             return;
         }
 
         if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
 
-        let room = getRoom(req, rooms);
+        room.lastUpdateTimeStamp = (new Date()).getTime();
 
         // Build an object representing the room data
 
@@ -332,7 +333,6 @@ module.exports = function() {
         if (!validateRoom(req, res, rooms)) return;
         if (!validatePlayerInRoom(req, res, rooms, req.body["RoomID"])) return;
 
-
         // If room has ended, inform
         if (validateRoomStatus(req, res, rooms, false, false, true, false)) {
             res.status(200).send({ message: "ended" });
@@ -402,6 +402,8 @@ module.exports = function() {
         if (!validateRoom(req, res, rooms)) return;
 
         let room = getRoom(req, rooms);
+
+        room.lastUpdateTimeStamp = (new Date()).getTime();
 
         // If room has ended, inform
         if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
