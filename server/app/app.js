@@ -467,7 +467,7 @@ function validateRoom(req, res, rooms) {
     let roomIndex = rooms.findIndex(room => room["roomCode"] === wantedRoomId);
 
     if (roomIndex === -1) {
-        res.status(404).send({ error: "Room " + wantedRoomId + " not found."});
+        res.status(200).send({ error: "Room " + wantedRoomId + " not found."});
         return false;
     }
 
@@ -530,7 +530,7 @@ function getRoom(req, rooms) {
 
 function validateRoomObject(res, room) {
     if (room === null) {
-        res.status(404).send({ error : "Room not found" });
+        res.status(200).send({ error : "Room not found" });
         return false;
     }
 
