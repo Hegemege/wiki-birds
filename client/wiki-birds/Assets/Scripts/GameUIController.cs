@@ -252,8 +252,8 @@ public class GameUIController : MonoBehaviour
         _roundEnded = true;
         //StopCoroutine(_gameLoop);
 
-            // Show scores
-            // TODO
+        if (!GameManager.Instance.IsHost) return;
+
         StartCoroutine(GoToScore());
     }
 
