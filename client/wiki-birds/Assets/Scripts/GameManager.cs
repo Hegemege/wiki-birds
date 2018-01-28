@@ -118,6 +118,11 @@ public class GameManager : MonoBehaviour
         StartCoroutine(RequestLeaveRoom(RoomCode));
     }
 
+    public void EndRound()
+    {
+        StartCoroutine(RequestEndRound());
+    }
+
     // Needs to be able to be interrupted, so Coroutine return
     public Coroutine GetGameInfo(Action<JObject> callback)
     {
@@ -349,7 +354,38 @@ public class GameManager : MonoBehaviour
             {
                 var responseBody = JObject.Parse(request.downloadHandler.text);
 
+                if (responseBody["message"].ToObject<string>().Equals("ended"))
+                {
+                    SceneManager.LoadScene("score");
+                }
+
                 callback(responseBody);
+            }
+        }
+    }
+
+    private IEnumerator RequestEndRound()
+    {
+        object body = new
+        {
+            Token = Token,
+            PlayerID = _playerId,
+            RoomID = RoomCode,
+        };
+
+        using (UnityWebRequest request = UnityWebRequest.Put(Server.ApiURL + "/end-round", JsonConvert.SerializeObject(body)))
+        {
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.isNetworkError || request.isHttpError) // Error
+            {
+                HandleRequestError(request);
+            }
+            else // Success
+            {
+                // Wait for room-info to get us the message
             }
         }
     }

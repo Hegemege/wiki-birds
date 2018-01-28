@@ -20,6 +20,8 @@ public class GameUIController : MonoBehaviour
     public Image Timer1;
     public Image Timer2;
 
+    public GameObject ReadyBG;
+
     public List<Sprite> Numbers;
 
     public List<Transform> SpawnAnchorsVertical;
@@ -49,6 +51,7 @@ public class GameUIController : MonoBehaviour
     private Coroutine _gameLoop;
 
     private int _roundNumber;
+    private bool _roundEnded;
 
     void Awake()
     {
@@ -217,10 +220,21 @@ public class GameUIController : MonoBehaviour
 
     private void TimeOut()
     {
-        StopCoroutine(_gameLoop);
+        if (_roundEnded) return;
 
-        // Show scores
-        // TODO
+        _roundEnded = true;
+        //StopCoroutine(_gameLoop);
+
+            // Show scores
+            // TODO
+        StartCoroutine(GoToScore());
+    }
+
+    private IEnumerator GoToScore()
+    {
+        yield return new WaitForSeconds(2f);
+
+        GameManager.Instance.EndRound();
     }
 
     void Update()
@@ -230,6 +244,8 @@ public class GameUIController : MonoBehaviour
         {
             Timer1.gameObject.SetActive(true);
             Timer2.gameObject.SetActive(true);
+
+            ReadyBG.SetActive(false);
 
             if (now < GameManager.Instance.NextRoundEnd)
             {
@@ -261,13 +277,13 @@ public class GameUIController : MonoBehaviour
                 Timer1.sprite = Numbers[leftTens];
                 Timer2.sprite = Numbers[leftOnes];
             }
-
-
         }
         else
         {
             Timer1.gameObject.SetActive(false);
             Timer2.gameObject.SetActive(false);
+
+            ReadyBG.SetActive(true);
 
             UpButton.gameObject.SetActive(false);
             DownButton.gameObject.SetActive(false);
