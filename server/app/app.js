@@ -83,7 +83,7 @@ const token = "9QfdXsTwmOPySh1zaB8A";
 const MIN_PLAYER_COUNT = 2;
 const MAX_PLAYER_COUNT = 4;
 
-const ROUND_START_DELAY = 3 * 1000;
+const ROUND_START_DELAY = 10 * 1000;
 const ROUND_LENGTH = 5 * 1000;
 
 module.exports = function() {

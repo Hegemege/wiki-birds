@@ -21,6 +21,13 @@ public class GameUIController : MonoBehaviour
     public Image Timer2;
 
     public GameObject ReadyBG;
+    public GameObject ReadyImage;
+    public GameObject Round1;
+    public GameObject Round2;
+    public GameObject Round3;
+
+    public List<AudioClip> RoundMusics;
+    public AudioSource RoundMusicPlayer;
 
     public List<Sprite> Numbers;
 
@@ -52,6 +59,7 @@ public class GameUIController : MonoBehaviour
 
     private int _roundNumber;
     private bool _roundEnded;
+    private int _roundIndex;
 
     void Awake()
     {
@@ -199,7 +207,11 @@ public class GameUIController : MonoBehaviour
             // Get round number
             _roundNumber = data["round"].ToObject<int>();
 
-            // TODO: round number music
+            _roundIndex = _roundNumber - 1;
+
+            RoundMusicPlayer.clip = RoundMusics[_roundIndex];
+
+            ReadyImage.SetActive(true);
 
             return;
         }
@@ -287,6 +299,29 @@ public class GameUIController : MonoBehaviour
 
             UpButton.gameObject.SetActive(false);
             DownButton.gameObject.SetActive(false);
+
+            if ((GameManager.Instance.NextRoundStart - now).TotalSeconds > 5f)
+            {
+                ReadyImage.SetActive(true);
+            }
+            else
+            {
+                ReadyImage.SetActive(false);
+                if (_roundIndex == 0)
+                {
+                    Round1.SetActive(true);
+                }
+
+                if (_roundIndex == 1)
+                {
+                    Round2.SetActive(true);
+                }
+
+                if (_roundIndex == 2)
+                {
+                    Round3.SetActive(true);
+                }
+            }
         }
 
 
