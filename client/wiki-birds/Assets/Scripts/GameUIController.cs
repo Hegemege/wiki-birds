@@ -147,87 +147,101 @@ public class GameUIController : MonoBehaviour
 
     private void HandleGameInfo(JObject data)
     {
-        var players = data["players"].ToObject<List<JObject>>();
-
-        // Also move players to the correct height immediately
-        var playerPositions = players.Select(player => new {
-            Color = player["color"].ToObject<string>(),
-            LineIndex = player["lineIndex"].ToObject<int>()
-        }).ToList();
-
-
-        // Disable the players that are not in the game
-        if (!_initialData)
+        try
         {
-            _initialData = true;
+            var players = data["players"].ToObject<List<JObject>>();
 
-            // Resolve colors, delete those who are not active
-            var playerColors = players.Select(player => player["color"].ToString());
-
-            foreach (var inactivePlayer in _otherBirdControllers.Where(other => !playerColors.Contains(other.Color)))
+            // Also move players to the correct height immediately
+            var playerPositions = players.Select(player => new
             {
-                inactivePlayer.Inactive = true;
-                Destroy(inactivePlayer.gameObject);
+                Color = player["color"].ToObject<string>(),
+                LineIndex = player["lineIndex"].ToObject<int>()
+            }).ToList();
+
+
+            // Disable the players that are not in the game
+            if (!_initialData)
+            {
+                _initialData = true;
+
+                // Resolve colors, delete those who are not active
+                var playerColors = players.Select(player => player["color"].ToString());
+
+                foreach (var inactivePlayer in _otherBirdControllers.Where(other => !playerColors.Contains(other.Color))
+                )
+                {
+                    inactivePlayer.Inactive = true;
+                    Destroy(inactivePlayer.gameObject);
+                }
+
+                var myBirdLineIndex = playerPositions.Single(pos => pos.Color == _myBirdController.Color).LineIndex;
+                var myBirdHeight =
+                    SpawnAnchorsVertical[myBirdLineIndex].position
+                        .y; // Potential bug if multiple players end to have the same color
+                _myBird.transform.position = new Vector3(_myBird.transform.position.x, myBirdHeight,
+                    _myBird.transform.position.z);
+                _myBirdController.CurrentLine = myBirdLineIndex;
+                _myBirdController.TargetLine = myBirdLineIndex;
+
+                foreach (var other in _otherBirdControllers)
+                {
+                    if (other.Inactive) continue;
+
+                    var birdLineIndex = playerPositions.Single(pos => pos.Color == other.Color).LineIndex;
+                    var birdHeight = SpawnAnchorsVertical[birdLineIndex].position.y;
+                    other.transform.position =
+                        new Vector3(other.transform.position.x, birdHeight, other.transform.position.z);
+
+                    other.CurrentLine = birdLineIndex;
+                    other.TargetLine = birdLineIndex;
+                }
+
+                // Resolve lines
+                CorrectLines = data["correctLines"].ToObject<List<string>>();
+
+                // Resolve words
+                var playerWords = players.Select(player => new
+                {
+                    Color = player["color"].ToObject<string>(),
+                    Word = player["word"].ToObject<string>()
+                });
+
+                _myBirdController.Word = playerWords.Single(word => word.Color == _myBirdController.Color).Word;
+                WordText.text = _myBirdController.Word;
+
+                // We dont care about the words of others right now
+                // TODO: score screen should show everyone's words in the end?
+
+                // Get round number
+                _roundNumber = data["round"].ToObject<int>();
+                GameManager.Instance.RoundNumber = _roundNumber;
+
+                _roundIndex = _roundNumber - 1;
+
+                RoundMusicPlayer.clip = RoundMusics[_roundIndex];
+                RoundMusicPlayer.Play();
+
+                ReadyImage.SetActive(true);
+
+                return;
             }
 
-            var myBirdLineIndex = playerPositions.Single(pos => pos.Color == _myBirdController.Color).LineIndex;
-            var myBirdHeight = SpawnAnchorsVertical[myBirdLineIndex].position.y; // Potential bug if multiple players end to have the same color
-            _myBird.transform.position = new Vector3(_myBird.transform.position.x, myBirdHeight, _myBird.transform.position.z);
-            _myBirdController.CurrentLine = myBirdLineIndex;
-            _myBirdController.TargetLine = myBirdLineIndex;
+            // Set other bird targets
 
             foreach (var other in _otherBirdControllers)
             {
                 if (other.Inactive) continue;
 
                 var birdLineIndex = playerPositions.Single(pos => pos.Color == other.Color).LineIndex;
-                var birdHeight = SpawnAnchorsVertical[birdLineIndex].position.y;
-                other.transform.position = new Vector3(other.transform.position.x, birdHeight, other.transform.position.z);
 
-                other.CurrentLine = birdLineIndex;
                 other.TargetLine = birdLineIndex;
             }
 
-            // Resolve lines
-            CorrectLines = data["correctLines"].ToObject<List<string>>();
-
-            // Resolve words
-            var playerWords = players.Select(player => new
-            {
-                Color = player["color"].ToObject<string>(),
-                Word = player["word"].ToObject<string>()
-            });
-
-            _myBirdController.Word = playerWords.Single(word => word.Color == _myBirdController.Color).Word;
-            WordText.text = _myBirdController.Word;
-
-            // We dont care about the words of others right now
-            // TODO: score screen should show everyone's words in the end?
-
-            // Get round number
-            _roundNumber = data["round"].ToObject<int>();
-
-            _roundIndex = _roundNumber - 1;
-
-            RoundMusicPlayer.clip = RoundMusics[_roundIndex];
-            RoundMusicPlayer.Play();
-
-            ReadyImage.SetActive(true);
-
-            return;
         }
-
-        // Set other bird targets
-
-        foreach (var other in _otherBirdControllers)
+        catch (Exception ex)
         {
-            if (other.Inactive) continue;
 
-            var birdLineIndex = playerPositions.Single(pos => pos.Color == other.Color).LineIndex;
-
-            other.TargetLine = birdLineIndex;
         }
-
 
     }
 

@@ -21,7 +21,7 @@ class Room {
         this.startTime = null;
         this.endTime = null;
         this.correctLines = [];
-        this.round = 1;
+        this.round = 0;
     }
 }
 
@@ -35,7 +35,7 @@ class Player {
         this.lineIndexUpdateTimestamp = (new Date()).getTime();
         this.points = 0;
     }
-}
+}   
 
 // Gamestate
 /*
@@ -108,8 +108,8 @@ const token = "9QfdXsTwmOPySh1zaB8A";
 const MIN_PLAYER_COUNT = 2;
 const MAX_PLAYER_COUNT = 4;
 
-const ROUND_START_DELAY = 10 * 1000;
-const ROUND_LENGTH = 30 * 1000;
+const ROUND_START_DELAY = 5 * 1000;
+const ROUND_LENGTH = 5 * 1000;
 
 module.exports = function() {
     const app = express();
@@ -269,7 +269,13 @@ module.exports = function() {
 
         if (!validateRoom(req, res, rooms)) return;
         if (!validateRoomOwner(req, res, rooms)) return;
-        if (!validateRoomStatus(req, res, rooms, true, false, false)) return;
+
+        if (!validateRoomStatus(req, res, rooms, true, false, false, false)) {
+            if (!validateRoomStatus(req, res, rooms, false, false, true, false)) {
+                res.status(400).send({ error: "Unable to start room." });
+                return;
+            }
+        }
 
         let room = getRoom(req, rooms);
 
@@ -286,6 +292,9 @@ module.exports = function() {
         // Update room status
         room["inRoom"] = false;
         room["inGame"] = true;
+        room["inFinal"] = false;
+
+        room["round"] += 1;
 
         // Update bird positions
         let positions = getPlayerPositions(room);
@@ -366,6 +375,7 @@ module.exports = function() {
 
         let room = getRoom(req, rooms);
 
+        room["inRoom"] = false;
         room["inGame"] = false;
         room["inFinal"] = true;
 
@@ -391,15 +401,15 @@ module.exports = function() {
 
         if (!validateRoom(req, res, rooms)) return;
 
+        let room = getRoom(req, rooms);
+
         // If room has ended, inform
         if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
-            res.status(200).send({ message: "ended" });
+            res.status(200).send({ message: "ended", startTime: room["startTime"], endTime: room["endTime"] });
             return;
         }
 
         if (!validateRoomStatus(req, res, rooms, false, false, true)) return;
-
-        let room = getRoom(req, rooms);
 
         res.status(200).send(room);
     });

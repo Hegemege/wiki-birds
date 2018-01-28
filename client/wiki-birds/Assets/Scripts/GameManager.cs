@@ -52,6 +52,9 @@ public class GameManager : MonoBehaviour
     public string RoomCode;
 
     [HideInInspector]
+    public int RoundNumber;
+
+    [HideInInspector]
     public DateTime NextRoundStart;
 
     [HideInInspector]
@@ -121,6 +124,11 @@ public class GameManager : MonoBehaviour
     public void EndRound()
     {
         StartCoroutine(RequestEndRound());
+    }
+
+    public Coroutine ScoreInfo(Action<JObject> callback)
+    {
+        return StartCoroutine(RequestRoundInfo(callback));
     }
 
     // Needs to be able to be interrupted, so Coroutine return
@@ -416,7 +424,14 @@ public class GameManager : MonoBehaviour
 
                 if (responseBody["message"].ToObject<string>().Equals("ended"))
                 {
+                    var startTime = responseBody["startTime"].ToObject<long>();
+                    var endTime = responseBody["endTime"].ToObject<long>();
+
+                    NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime);
+                    NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime);
+
                     SceneManager.LoadScene("game");
+                    yield break;
                 }
 
                 callback(responseBody);
