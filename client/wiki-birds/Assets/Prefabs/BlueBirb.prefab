@@ -68,6 +68,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4213373313108218}
   - component: {fileID: 95768448019445954}
+  - component: {fileID: 114449156011659550}
   m_Layer: 0
   m_Name: BlueBirb
   m_TagString: Untagged
@@ -176,6 +177,21 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114449156011659550
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1362142909202006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5db925ccdb8a6c4d88ef29892d61d44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Color: 
+  HorizontalIndex: 0
+  Word: 
+  Inactive: 0
 --- !u!212 &212566621160364644
 SpriteRenderer:
   m_ObjectHideFlags: 1

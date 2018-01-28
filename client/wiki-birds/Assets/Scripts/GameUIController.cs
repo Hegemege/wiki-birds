@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameUIController : MonoBehaviour
 {
@@ -14,16 +15,27 @@ public class GameUIController : MonoBehaviour
     public GameObject YellowBirdPrefab;
     public GameObject GreenBirdPrefab;
 
+    public Text WordText;
+    public AudioSource LineSound;
+
+    [HideInInspector]
+    public List<string> CorrectLines;
+
+    public List<string> Words;
+    public List<AudioClip> Clips;
+
     private GameObject _myBird;
     private List<GameObject> _others;
 
     private BirdController _myBirdController;
     private List<BirdController> _otherBirdControllers;
 
-    private bool _disabledPlayers;
+    private bool _initialData;
 
     void Awake()
     {
+        WordText.text = "";
+
         _others = new List<GameObject>();
         _otherBirdControllers = new List<BirdController>();
         GameObject colorPrefab = null;
@@ -63,6 +75,8 @@ public class GameUIController : MonoBehaviour
         _myBird.transform.position = new Vector3(_myBird.transform.position.x, -1000f, _myBird.transform.position.z);
 
         _myBirdController = _myBird.GetComponent<BirdController>();
+        _myBirdController.Color = GameManager.Instance.PlayerColor;
+        _myBirdController.HorizontalIndex = myIndex;
 
         // Generate other birds
         foreach (var other in otherPrefabs)
@@ -72,8 +86,12 @@ public class GameUIController : MonoBehaviour
 
             otherBird.transform.position = SpawnAnchorsHorizontal[otherIndex].position;
             otherBird.transform.position = new Vector3(otherBird.transform.position.x, -1000f, otherBird.transform.position.z);
+            var otherController = otherBird.GetComponent<BirdController>();
 
-            _otherBirdControllers.Add(otherBird.GetComponent<BirdController>());
+            otherController.Color = GetColorFromPrefab(other);
+            otherController.HorizontalIndex = otherIndex;
+
+            _otherBirdControllers.Add(otherController);
             _others.Add(otherBird);
         }
 
@@ -94,24 +112,62 @@ public class GameUIController : MonoBehaviour
     private void HandleGameInfo(JObject data)
     {
         // Disable the players that are not in the game
-        if (!_disabledPlayers)
+        if (!_initialData)
         {
-            _disabledPlayers = true;
+            _initialData = true;
 
-            var players = data["players"].ToObject<List<JObject>>().Select(player => player["color"].ToString());
+            var players = data["players"].ToObject<List<JObject>>();
 
-            Debug.Log(players);
+            // Resolve colors, delete those who are not active
+            var playerColors = players.Select(player => player["color"].ToString());
 
-            foreach (var inactivePlayer in _otherBirdControllers.Where(other => !players.Contains(other.Color)))
+            foreach (var inactivePlayer in _otherBirdControllers.Where(other => !playerColors.Contains(other.Color)))
             {
-                Debug.Log("Remove " + inactivePlayer.Color);
+                inactivePlayer.Inactive = true;
+                Destroy(inactivePlayer.gameObject);
             }
 
             // Also move players to the correct height immediately
-            //var playerPositions = data["players"].ToObject<List<dynamic>>();
+            var playerPositions = players.Select(player => new {
+                Color = player["color"].ToObject<string>(),
+                LineIndex = player["lineIndex"].ToObject<int>()
+            });
 
+            var myBirdLineIndex = playerPositions.Single(pos => pos.Color == _myBirdController.Color).LineIndex;
+            var myBirdHeight = SpawnAnchorsVertical[myBirdLineIndex].position.y; // Potential bug if multiple players end to have the same color
+            _myBird.transform.position = new Vector3(_myBird.transform.position.x, myBirdHeight, _myBird.transform.position.z);
+            _myBirdController.CurrentLine = myBirdLineIndex;
+            _myBirdController.TargetLine = myBirdLineIndex;
+
+            foreach (var other in _otherBirdControllers)
+            {
+                if (other.Inactive) continue;
+
+                var birdLineIndex = playerPositions.Single(pos => pos.Color == other.Color).LineIndex;
+                var birdHeight = SpawnAnchorsVertical[birdLineIndex].position.y;
+                other.transform.position = new Vector3(other.transform.position.x, birdHeight, other.transform.position.z);
+
+                other.CurrentLine = birdLineIndex;
+                other.TargetLine = birdLineIndex;
+            }
+
+            // Resolve lines
+            CorrectLines = data["correctLines"].ToObject<List<string>>();
+
+            // Resolve words
+            var playerWords = players.Select(player => new
+            {
+                Color = player["color"].ToObject<string>(),
+                Word = player["word"].ToObject<string>()
+            });
+
+            _myBirdController.Word = playerWords.Single(word => word.Color == _myBirdController.Color).Word;
+            WordText.text = _myBirdController.Word;
+
+            // We dont care about the words of others right now
+            // TODO: score screen show everyone's words
         }
-        
+
 
     }
 
@@ -123,5 +179,15 @@ public class GameUIController : MonoBehaviour
         if (prefab == BlueBirdPrefab) return 3;
 
         return 0; // Will not run
+    }
+
+    private string GetColorFromPrefab(GameObject prefab)
+    {
+        if (prefab == RedBirdPrefab) return "Red";
+        if (prefab == BlueBirdPrefab) return "Blue";
+        if (prefab == YellowBirdPrefab) return "Yellow";
+        if (prefab == GreenBirdPrefab) return "Green";
+
+        return "Red";
     }
 }

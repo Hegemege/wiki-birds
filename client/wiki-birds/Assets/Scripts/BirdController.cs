@@ -12,4 +12,13 @@ public class BirdController : MonoBehaviour
 
     [HideInInspector]
     public string Word;
+
+    [HideInInspector]
+    public bool Inactive;
+
+    [HideInInspector]
+    public int CurrentLine;
+
+    [HideInInspector]
+    public int TargetLine;
 }
