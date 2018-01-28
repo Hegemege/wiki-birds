@@ -290,6 +290,18 @@ Prefab:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 3.5070002
       objectReference: {fileID: 0}
+    - target: {fileID: 1348248286975980, guid: 9d57d26136ccc4f08a974b1eb6f38014, type: 2}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1771875282360566, guid: 9d57d26136ccc4f08a974b1eb6f38014, type: 2}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1419503996130364, guid: 9d57d26136ccc4f08a974b1eb6f38014, type: 2}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9d57d26136ccc4f08a974b1eb6f38014, type: 2}
   m_IsPrefabParent: 0
@@ -971,7 +983,7 @@ GameObject:
   - component: {fileID: 520986939}
   - component: {fileID: 520986941}
   - component: {fileID: 520986940}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: wire_1 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1043,7 +1055,7 @@ GameObject:
   - component: {fileID: 538317536}
   - component: {fileID: 538317538}
   - component: {fileID: 538317537}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_line_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2791,7 +2803,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1278741289}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: p_line_UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3690,7 +3702,7 @@ GameObject:
   - component: {fileID: 2040717220}
   - component: {fileID: 2040717222}
   - component: {fileID: 2040717221}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: wire_1 (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
