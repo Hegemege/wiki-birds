@@ -21,4 +21,17 @@ public class BirdController : MonoBehaviour
 
     [HideInInspector]
     public int TargetLine;
+
+    private Animator anim;
+
+    void Awake()
+    {
+        anim = GetComponentInChildren<Animator>();
+    }
+
+    void Update()
+    {
+        anim.SetBool("Fly", CurrentLine != TargetLine);
+        anim.SetBool("Land", CurrentLine == TargetLine);
+    }
 }
