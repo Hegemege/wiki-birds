@@ -28,7 +28,7 @@ AnimatorState:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: GreenBirb_Victory
-  m_Speed: 1
+  m_Speed: 1.3
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -78,7 +78,7 @@ AnimatorState:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: GreenBirb_Fly
-  m_Speed: 1
+  m_Speed: 1.5
   m_CycleOffset: 0
   m_Transitions: []
   m_StateMachineBehaviours: []
@@ -106,20 +106,20 @@ AnimatorStateMachine:
   m_ChildStates:
   - serializedVersion: 1
     m_State: {fileID: 1102490041321722380}
-    m_Position: {x: 200, y: 0, z: 0}
+    m_Position: {x: 312, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102898327076368172}
-    m_Position: {x: 235, y: 65, z: 0}
+    m_Position: {x: 576, y: 180, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1102259438391036002}
-    m_Position: {x: 270, y: 130, z: 0}
+    m_Position: {x: 828, y: 180, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions: {}
   m_StateMachineBehaviours: []
-  m_AnyStatePosition: {x: 50, y: 20, z: 0}
-  m_EntryPosition: {x: 50, y: 120, z: 0}
-  m_ExitPosition: {x: 800, y: 120, z: 0}
+  m_AnyStatePosition: {x: 672, y: -12, z: 0}
+  m_EntryPosition: {x: 336, y: 84, z: 0}
+  m_ExitPosition: {x: 876, y: -12, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}
   m_DefaultState: {fileID: 1102490041321722380}
