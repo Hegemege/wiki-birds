@@ -14,21 +14,22 @@ class Room {
         this.lastUpdateTimeStamp = this.spawnTimeStamp;
         this.roomCode = roomCode;
         this.hostPlayer = hostPlayer;
-        this.players = [new Player(getRandomPlayerName(), hostPlayer)];
+        this.players = [];
         this.inRoom = true;
         this.inGame = false;
         this.inFinal = false;
         this.startTime = null;
         this.endTime = null;
         this.correctLines = [];
+        this.round = 1;
     }
 }
 
 class Player {
-    constructor(name, playerId) {
+    constructor(name, color, playerId) {
         this.playerId = playerId;
         this.name = name;
-        this.color = getRandomPlayerColor();
+        this.color = color;
         this.lineIndex = -1;
         this.word = "";
     }
@@ -128,6 +129,9 @@ module.exports = function() {
 
         rooms.push(newRoom);
 
+        var host = new Player(getRandomPlayerName(newRoom), getRandomPlayerColor(newRoom), hostPlayerID);
+        newRoom.players.push(host);
+
         res.status(200).send({ message: "success", roomCode: newRoomCode, playerName: newRoom["players"][0]["name"], playerColor: newRoom["players"][0]["color"] });
 
         console.log("Player " + hostPlayerID + " created room " + newRoomCode);
@@ -160,7 +164,7 @@ module.exports = function() {
         }
 
         // Add player to room
-        let newPlayer = new Player(getRandomPlayerName(room), playerId);
+        let newPlayer = new Player(getRandomPlayerName(room), getRandomPlayerColor(room), playerId);
         rooms[roomIndex].players.push(newPlayer);
 
         res.status(200).send({ message: "success", playerName: newPlayer["name"], playerColor: newPlayer["color"] })

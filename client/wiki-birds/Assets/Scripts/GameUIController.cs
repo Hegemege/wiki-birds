@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -7,6 +8,14 @@ using UnityEngine.UI;
 
 public class GameUIController : MonoBehaviour
 {
+    public float MovementSpeed;
+
+    public Camera CameraRef;
+    public Canvas CanvasRef;
+
+    public RectTransform UpButton;
+    public RectTransform DownButton;
+
     public List<Transform> SpawnAnchorsVertical;
     public List<Transform> SpawnAnchorsHorizontal;
 
@@ -74,6 +83,8 @@ public class GameUIController : MonoBehaviour
         _myBird.transform.position = SpawnAnchorsHorizontal[myIndex].position;
         _myBird.transform.position = new Vector3(_myBird.transform.position.x, -1000f, _myBird.transform.position.z);
 
+        _myBird.transform.localScale = Vector3.one * 0.37f;
+
         _myBirdController = _myBird.GetComponent<BirdController>();
         _myBirdController.Color = GameManager.Instance.PlayerColor;
         _myBirdController.HorizontalIndex = myIndex;
@@ -86,6 +97,9 @@ public class GameUIController : MonoBehaviour
 
             otherBird.transform.position = SpawnAnchorsHorizontal[otherIndex].position;
             otherBird.transform.position = new Vector3(otherBird.transform.position.x, -1000f, otherBird.transform.position.z);
+
+            otherBird.transform.localScale = Vector3.one * 0.37f;
+
             var otherController = otherBird.GetComponent<BirdController>();
 
             otherController.Color = GetColorFromPrefab(other);
@@ -111,12 +125,19 @@ public class GameUIController : MonoBehaviour
 
     private void HandleGameInfo(JObject data)
     {
+        var players = data["players"].ToObject<List<JObject>>();
+
+        // Also move players to the correct height immediately
+        var playerPositions = players.Select(player => new {
+            Color = player["color"].ToObject<string>(),
+            LineIndex = player["lineIndex"].ToObject<int>()
+        }).ToList();
+
+
         // Disable the players that are not in the game
         if (!_initialData)
         {
             _initialData = true;
-
-            var players = data["players"].ToObject<List<JObject>>();
 
             // Resolve colors, delete those who are not active
             var playerColors = players.Select(player => player["color"].ToString());
@@ -126,12 +147,6 @@ public class GameUIController : MonoBehaviour
                 inactivePlayer.Inactive = true;
                 Destroy(inactivePlayer.gameObject);
             }
-
-            // Also move players to the correct height immediately
-            var playerPositions = players.Select(player => new {
-                Color = player["color"].ToObject<string>(),
-                LineIndex = player["lineIndex"].ToObject<int>()
-            });
 
             var myBirdLineIndex = playerPositions.Single(pos => pos.Color == _myBirdController.Color).LineIndex;
             var myBirdHeight = SpawnAnchorsVertical[myBirdLineIndex].position.y; // Potential bug if multiple players end to have the same color
@@ -165,10 +180,96 @@ public class GameUIController : MonoBehaviour
             WordText.text = _myBirdController.Word;
 
             // We dont care about the words of others right now
-            // TODO: score screen show everyone's words
+            // TODO: score screen should show everyone's words in the end?
+
+            // TODO: Round number
+            // Get round number
+            // TODO: round number music
+
+
+            return;
+        }
+
+        // Set other bird targets
+
+        foreach (var other in _otherBirdControllers)
+        {
+            if (other.Inactive) continue;
+
+            var birdLineIndex = playerPositions.Single(pos => pos.Color == other.Color).LineIndex;
+
+            other.TargetLine = birdLineIndex;
         }
 
 
+    }
+
+    void FixedUpdate()
+    {
+        var dt = Time.fixedDeltaTime;
+
+        var birdScreenPosition = CameraRef.WorldToScreenPoint(_myBird.transform.position);
+        Vector2 localPoint;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(CanvasRef.transform as RectTransform, birdScreenPosition, CameraRef, out localPoint);
+
+        UpButton.anchoredPosition = localPoint + new Vector2(0f, 200f);
+        DownButton.anchoredPosition = localPoint - new Vector2(0f, 200f);
+
+        // Bird movement
+        MoveBird(_myBird, _myBirdController, dt);
+        foreach (var bird in _otherBirdControllers)
+        {
+            if (bird.Inactive) continue;
+
+            MoveBird(bird.gameObject, bird, dt);
+        }
+
+        // Do my bird audio stuff if current == target
+    }
+
+    private void MoveBird(GameObject bird, BirdController birdController, float dt)
+    {
+        if (birdController.TargetLine == birdController.CurrentLine) return;
+
+        // Get target height
+        var targetHeight = SpawnAnchorsVertical[birdController.TargetLine].position.y;
+
+        if (targetHeight > bird.transform.position.y)
+        {
+            bird.transform.position += new Vector3(0f, 1f, 0f) * dt * MovementSpeed;
+
+            if (targetHeight <= bird.transform.position.y)
+            {
+                bird.transform.position = new Vector3(bird.transform.position.x, targetHeight, bird.transform.position.z);
+                birdController.CurrentLine = birdController.TargetLine;
+            }
+        }
+        else if (targetHeight < bird.transform.position.y)
+        {
+            bird.transform.position -= new Vector3(0f, 1f, 0f) * dt * MovementSpeed;
+
+            if (targetHeight >= bird.transform.position.y)
+            {
+                bird.transform.position = new Vector3(bird.transform.position.x, targetHeight, bird.transform.position.z);
+                birdController.CurrentLine = birdController.TargetLine;
+            }
+        }
+    }
+
+    public void GoUp()
+    {
+        if (_myBirdController.TargetLine > 0)
+        {
+            _myBirdController.TargetLine -= 1;
+        }
+    }
+
+    public void GoDown()
+    {
+        if (_myBirdController.TargetLine < 3)
+        {
+            _myBirdController.TargetLine += 1;
+        }
     }
 
     private int GetHorizontalIndex(GameObject prefab)

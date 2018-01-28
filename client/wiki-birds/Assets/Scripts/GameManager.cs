@@ -54,6 +54,12 @@ public class GameManager : MonoBehaviour
     [HideInInspector]
     public DateTime NextRoundStart;
 
+    [HideInInspector]
+    public DateTime NextRoundEnd;
+
+    [HideInInspector]
+    public BirdController MyBirdController;
+
     void Awake()
     {
         if (_instance != null)
@@ -297,8 +303,10 @@ public class GameManager : MonoBehaviour
                 if (responseBody["message"].ToString().Equals("started"))
                 {
                     var startTime = responseBody["startTime"].ToObject<long>();
+                    var endTime = responseBody["endTime"].ToObject<long>();
 
                     NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime);
+                    NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime);
 
                     SceneManager.LoadScene("game");
                     yield break;
