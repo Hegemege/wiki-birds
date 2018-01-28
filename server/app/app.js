@@ -109,7 +109,7 @@ const MIN_PLAYER_COUNT = 2;
 const MAX_PLAYER_COUNT = 4;
 
 const ROUND_START_DELAY = 10 * 1000;
-const ROUND_LENGTH = 30 * 1000;
+const ROUND_LENGTH = 20 * 1000;
 
 module.exports = function() {
     const app = express();
