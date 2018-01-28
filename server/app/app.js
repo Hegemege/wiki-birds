@@ -243,7 +243,7 @@ module.exports = function() {
         // If room is no longer in room state, tell client to go to game
         if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
             let room = getRoom(req, rooms);
-            res.status(200).send({ message: "started", startTime: room["startTime"], endTime: room["endTime"] });
+            res.status(200).send({ message: "started", now: (new Date()).getTime(), startTime: room["startTime"], endTime: room["endTime"] });
             return;
         }
 
@@ -405,7 +405,7 @@ module.exports = function() {
 
         // If room has ended, inform
         if (validateRoomStatus(req, res, rooms, false, true, false, false)) {
-            res.status(200).send({ message: "ended", startTime: room["startTime"], endTime: room["endTime"] });
+            res.status(200).send({ message: "ended", now: (new Date()).getTime(), startTime: room["startTime"], endTime: room["endTime"] });
             return;
         }
 

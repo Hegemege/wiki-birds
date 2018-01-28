@@ -318,8 +318,17 @@ public class GameManager : MonoBehaviour
                     var startTime = responseBody["startTime"].ToObject<long>();
                     var endTime = responseBody["endTime"].ToObject<long>();
 
-                    NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime);
-                    NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime);
+                    var now = responseBody["now"].ToObject<long>();
+
+                    var localDifference = (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(now) -
+                                           DateTime.UtcNow).TotalMilliseconds;
+
+                    NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime).AddMilliseconds(localDifference);
+                    NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime).AddMilliseconds(localDifference);
+
+                    Debug.Log(localDifference);
+                    Debug.Log(NextRoundStart);
+                    Debug.Log(NextRoundEnd);
 
                     SceneManager.LoadScene("game");
                     yield break;
@@ -426,6 +435,12 @@ public class GameManager : MonoBehaviour
                 {
                     var startTime = responseBody["startTime"].ToObject<long>();
                     var endTime = responseBody["endTime"].ToObject<long>();
+                    var now = responseBody["now"].ToObject<long>();
+
+                    var localDifference = (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(now) -
+                                           DateTime.UtcNow).TotalMilliseconds;
+
+                    Debug.Log(localDifference);
 
                     NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime);
                     NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime);
