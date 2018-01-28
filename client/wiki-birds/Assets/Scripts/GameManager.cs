@@ -320,15 +320,10 @@ public class GameManager : MonoBehaviour
 
                     var now = responseBody["now"].ToObject<long>();
 
-                    var localDifference = (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(now) -
-                                           DateTime.UtcNow).TotalMilliseconds;
+                    var localDifference = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(now)).TotalMilliseconds;
 
                     NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime).AddMilliseconds(localDifference);
                     NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime).AddMilliseconds(localDifference);
-
-                    Debug.Log(localDifference);
-                    Debug.Log(NextRoundStart);
-                    Debug.Log(NextRoundEnd);
 
                     SceneManager.LoadScene("game");
                     yield break;
@@ -437,13 +432,10 @@ public class GameManager : MonoBehaviour
                     var endTime = responseBody["endTime"].ToObject<long>();
                     var now = responseBody["now"].ToObject<long>();
 
-                    var localDifference = (new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(now) -
-                                           DateTime.UtcNow).TotalMilliseconds;
+                    var localDifference = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(now)).TotalMilliseconds;
 
-                    Debug.Log(localDifference);
-
-                    NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime);
-                    NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime);
+                    NextRoundStart = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(startTime).AddMilliseconds(localDifference);
+                    NextRoundEnd = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddMilliseconds(endTime).AddMilliseconds(localDifference);
 
                     SceneManager.LoadScene("game");
                     yield break;
